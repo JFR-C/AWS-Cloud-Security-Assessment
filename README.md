@@ -385,6 +385,9 @@ $ python prowler-cli.py -v
 
 ### III. AWS PENETRATION TESTING
 
+https://pentestbook.six2dez.com/enumeration/cloud/aws
+https://www.hackerone.com/knowledge-center/penetration-testing-aws-practical-guide
+
 #### A. Black-box penetration test (we start with no account)
 #### B. Grey-box penetration test (we start with 1 low-privileged Windows account)
 
