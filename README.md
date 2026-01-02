@@ -11,8 +11,14 @@ Technical notes, audit & pentest methodology, list of tools, scripts and command
  
 | Amazon Web Service | ACTION | COMMAND | 
 | :-----: | :-----: | :-----: | 
-| IAM | Get basic account info | aws sts get-caller-identity | 
+| STS | Get basic account info | aws sts get-caller-identity | 
 | IAM | List IAM users | aws iam list-users | 
+| IAM | Display the (custom) account password policy | aws iam get-account-password-policy |
+| IAM | Create or change the (custom) account password policy | aws iam update-account-password-policy |
+| IAM | List all MFA devices | aws iam list-mfa-devices | 
+| IAM | List all MFA devices for a IAM user | aws iam list-mfa-devices --user-name username | 
+| IAM | Generate a credential report that lists all users in your account and the status of their various credentials, including passwords, access keys, and MFA devices. | aws iam generate-credential-report | 
+| IAM | View the last credential report that was generated | aws iam get-credential-report | 
 | IAM | List access keys for a user | aws iam list-access-keys --user-name username | 
 | IAM | Backdoor account with second set of access keys | aws iam create-access-key --user-name username | 
 | IAM | List IAM roles | aws iam list-roles | 
