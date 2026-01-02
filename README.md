@@ -3,9 +3,23 @@ Audit & pentest methodology, technical notes, list of tools, scripts and command
 >The output files included here are the results of tools, scripts and commands that I ran against my testing AWS environment and some free CTF/Lab AWS environment. 
 
 ### Table of contents 
+- I. AWS Cloud Essentials  
+  - A. Introduction
+  - B. Main AWS services across IaaS, PaaS, and SaaS
+  - C. List of usefull AWS CLI commands
+  - D. Cloud‑Native Application Protection Platforms (CNAPP)
+ 
+- II. AWS Security Audit
+  - A.
+  - B.
 
+- III. AWS Penetration Testing
+  - A. Black-box penetration test (we start with no account)
+  - B. Grey-box penetration test (we start with 1 low-privileged Windows account)
 
-#### I. AWS Cloud Essentials (Definition, List of commands, ...)
+----------------
+
+#### I. AWS Cloud Essentials <i/>(Intro, list of AWS services and AWS CLI commands, CNAPPS, ...)</i>
 
 > A. Introduction
 
@@ -15,7 +29,7 @@ The AWS Cloud encompasses a broad set of global cloud-based products that includ
 - AWS delivers cloud capabilities through the three service models: Software as a Service (SaaS), Platform as a Service (PaaS), and Infrastructure as a Service (IaaS). 
 These models differ in how much control the customer retains versus how much AWS manages. Understanding these layers helps teams choose the right level of abstraction for their applications, operations, and security responsibilities.
 
-> B. List of the main AWS services across IaaS, PaaS, and SaaS
+> B. Main AWS services across IaaS, PaaS, and SaaS
 
 - AWS Cloud - Infrastructure as a Service (IaaS) - These services give raw compute, storage, and networking building blocks.
   - Amazon EC2 — Provides resizable virtual servers in the cloud with full OS‑level control.
@@ -39,6 +53,8 @@ These models differ in how much control the customer retains versus how much AWS
   - Amazon DynamoDB — A fully managed NoSQL database with single‑digit millisecond performance.
   - Amazon SQS — A managed message queuing service for decoupling distributed systems.
   - Amazon SNS — A pub/sub messaging service for event notifications.
+  - AWS CloudTrail — Records API activity and governance events across your AWS environment.
+  - AWS Control Tower (Cloud Foundation) — Provides automated landing zone setup and governance for multi‑account AWS environments.
   - ...
 
 - AWS Cloud - Software as a Service (SaaS) - These are fully managed applications delivered directly to end users.
@@ -49,6 +65,7 @@ These models differ in how much control the customer retains versus how much AWS
   - AWS Managed Services (AMS) — Provides ongoing operations management for enterprise AWS environments.
   - AWS IoT Device Management — A fully managed service for onboarding and managing IoT devices at scale.
   - Amazon Connect — A cloud‑based contact center platform for customer service operations.
+  - Amazon GuardDuty — A fully managed threat detection service that continuously monitors for malicious activity.
   - ...
 
 > C. List of usefull AWS CLI commands
@@ -84,10 +101,42 @@ These models differ in how much control the customer retains versus how much AWS
 | Lambda (Serverless) | List Lambda functions | aws lambda list-functions --region region | 
 | Kubernetes (EKS) | List EKS clusters | aws eks list-clusters --region region | 
 | Kubernetes (EKS) | Update kubeconfig | aws eks update-kubeconfig --name cluster-name --region region | 
-  
+
+> D. Cloud‑Native Application Protection Platforms (CNAPP)
+
+- Effective CNAPP solutions must consolidate capabilities rather than rebrand existing traditional security tools:
+  - Cloud Security Posture Management (CSPM) - Continuous misconfiguration detection and security posture monitoring
+  - Cloud Workload Protection Platform (CWPP) - Runtime protection for VMs, containers, and serverless functions
+  - Cloud Infrastructure Entitlement Management (CIEM) - Identity governance and cloud infrastructure access controls
+  - Data Security Posture Management (DSPM) - Sensitive data discovery and data security classification
+  - Infrastructure as Code (IaC) scanning - Early development process security validation
+  - ...
+ 
+- AWS doesn’t have a native CNAPP but it provides modular security services that customers can combine like:
+  - GuardDuty (threat detection)
+  - Security Hub (security posture aggregation)
+  - Inspector (vulnerability scanning)
+  - IAM Access Analyzer (identity risk analysis)
+  - CloudTrail (activity logging)
+
+- Main CNAPP  
+  - PRISMA Cloud (Palo Alto Networks)
+    - It is a full CNAPP platform that secures cloud environments across the entire application lifecycle, including CSPM (security posture management), CWPP (workload protection), CIEM, IaC scanning, and runtime protection.
+    - It provides unified visibility and threat detection across multi‑cloud deployments, helping organizations secure workloads, identities, and configurations from code to production.
+  - WIZ
+    - It is an agentless CNAPP platform known for deep cloud visibility, vulnerability detection, and risk prioritization across multi‑cloud environments. It correlates misconfigurations, vulnerabilities, identities, and network exposure to highlight the most critical attack paths.
+    - Security Graph technology analyzes relationships between technologies in cloud environments to uncover critical pathways to breaches with contextual data. Attack path analysis provides prioritized issues showing toxic combinations of risk with high probability of exploitation and significant business impact.
+  - Microsoft Defender for Cloud
+    - It offers CSPM and CWPP with deep Azure integration and strong support for AWS and GCP. It provides automated hardening recommendations, threat detection, and compliance monitoring.
+  - ORCA Security
+    - It is an agentless CNAPP platform that scans cloud environments using side‑scanning technology to detect vulnerabilities, misconfigurations, and identity risks. It provides broad visibility across workloads, containers, and cloud services without requiring agents.
+  - CrowdStrike Falcon Cloud Security
+    - It is a cloud security suite that focuses heavily on workload protection, runtime threat detection, and behavioral analytics. It integrates with the broader Falcon platform, providing unified endpoint and cloud threat intelligence.
+
+
 ----------------
 
-#### II. AWS Security Assessement
+#### II. AWS SECURITY AUDIT
 
 - Using an AWS account run tools and scripts that will extract and analyse the AWS environment looking for potential security misconfiguration, and other security issues in key services such as:
   - IAM
@@ -99,6 +148,9 @@ These models differ in how much control the customer retains versus how much AWS
 
 ----------------
 
-#### III. AWS Penetration Testing
+#### III. AWS PENETRATION TESTING
+
+1. Black-box penetration test (we start with no account)
+2. Grey-box penetration test (we start with 1 low-privileged Windows account)
 
 
