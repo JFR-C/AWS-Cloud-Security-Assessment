@@ -6,9 +6,10 @@ Audit & pentest methodology, technical notes, list of tools, scripts and command
 - I. AWS Cloud Essentials  
   - A. Introduction
   - B. Main AWS services across IaaS, PaaS, and SaaS
-  - C. List of usefull AWS CLI commands
-  - D. AWS Security Checklist & Best Practices
+  - D. AWS Security Best Practices
+  - D. IAM Users vs. IAM Roles — Key Differences
   - E. Cloud‑Native Application Protection Platforms (CNAPP)
+  - F. List of usefull AWS CLI commands
 
 - II. AWS Security Audit
   - A.
@@ -70,42 +71,8 @@ These models differ in how much control the customer retains versus how much AWS
   - Amazon GuardDuty — A fully managed threat detection service that continuously monitors for malicious activity.
   - ...
 
-> C. List of usefull AWS CLI commands
- 
-| Amazon Web Service | ACTION | COMMAND | 
-| :-----: | :-----: | :-----: | 
-| STS | Get basic account info | aws sts get-caller-identity | 
-| IAM | List IAM users | aws iam list-users | 
-| IAM | Display the (custom) account password policy | aws iam get-account-password-policy |
-| IAM | Create or change the (custom) account password policy | aws iam update-account-password-policy |
-| IAM | List all MFA devices | aws iam list-mfa-devices | 
-| IAM | List all MFA devices for a IAM user | aws iam list-mfa-devices --user-name username | 
-| IAM | Generate a credential report that lists all users in your account and the status of their various credentials, including passwords, access keys, and MFA devices. | aws iam generate-credential-report | 
-| IAM | View the last credential report that was generated | aws iam get-credential-report | 
-| IAM | List access keys for a user | aws iam list-access-keys --user-name username | 
-| IAM | Backdoor account with second set of access keys | aws iam create-access-key --user-name username | 
-| IAM | List IAM roles | aws iam list-roles | 
-| IAM | Export and brute force all roles for assume role escalation | aws iam list-roles --query 'Roles[].Arn' PIPE-SYMBOL jq -r '.[]' >> rolearns.txt while read r; do echo $r; aws sts assume-role --role-arn $r --role-session-name awshax; done < rolearns.txt | 
-| S3 | List S3 buckets accessible to an account | aws s3 ls | 
-| S3 | List all S3 buckets | aws s3 ls PIPE-SYMBOL awk '{print $3}' >> s3-all-buckets.txt | 
-| S3 | List the contents of an S3 bucket | aws s3 ls s3://bucketname | 
-| S3 | Download contents of a S3 bucket | aws s3 sync s3://bucketname s3-files-dir | 
-| EC2 (VM) | List EC2 instances | aws ec2 describe-instances | 
-| EC2 (VM)| Export all EC2 Instance User Data | while read r; do for instance in $(aws ec2 describe-instances --query 'Reservations[].Instances[].InstanceId' --region $r PIPE-SYMBOL jq -r '.[]'); do aws ec2 describe-instance-attribute --region $r --instance-id $instance --attribute userData >> ec2-instance-userdata.txt; done; done < regions.txt | 
-| EC2 (VM) | List EC2 subnets | aws ec2 describe-subnets | 
-| EC2 (VM) | List EC2 network interfaces | aws ec2 describe-network-interfaces | 
-| EC2 (VM) | Instance Metadata Service URL | http://169.254.169.254/latest/meta-data | 
-| EC2 (VM) | Additional IAM creds possibly available here | http://169.254.169.254/latest/meta-data/iam/security-credentials/IAM-Role-Name | 
-| DirectConnect (VPN) | List DirectConnect (VPN) connections | aws directconnect describe-connections | 
-| RDS | List all RDS Snapshots | aws rds describe-db-snapshots --region us-east-1 --snapshot-type manual --query=DBSnapshots[*].DBSnapshotIdentifier | 
-| Lambda (Serverless) | List Lambda functions | aws lambda list-functions --region region | 
-| Lambda (Serverless) | Look at environment variables set for secrets and analyze code | aws lambda get-function --function-name lambda-function-name | 
-| Lambda (Serverless) | List Lambda functions | aws lambda list-functions --region region | 
-| Kubernetes (EKS) | List EKS clusters | aws eks list-clusters --region region | 
-| Kubernetes (EKS) | Update kubeconfig | aws eks update-kubeconfig --name cluster-name --region region | 
 
-
-> D. AWS Security Checklist & Best Practices
+> C. AWS Security Best Practices
 
 - Identity & Access Management
   - 1. Secure your AWS account.
@@ -177,6 +144,27 @@ Balancer access logging, to gain visibility into events. Configure logs to flow 
   - 3. Practice responding to events.
     - Simulate and practice incident response by running regular game days, incorporating the lessons learned into your incident management plans, and continuously improving them.
 
+> D. IAM Users vs. IAM Roles — Key Differences
+  - 1. Credential Type
+    - IAM Users: Have long‑lived credentials — passwords and access keys that persist until manually rotated.
+    - IAM Roles: Provide temporary credentials issued by STS that automatically expire, reducing risk if compromised.
+  - 2. Intended Use
+    - IAM Users: Designed for human access (admins, developers) who need console login or programmatic access.
+    - IAM Roles: Designed for AWS services, applications, and cross‑account access — not for direct login.
+  - 3. How Access Is Granted
+    - IAM Users: Are directly assigned permissions via policies attached to the user or their groups.
+    - IAM Roles: Have no inherent permissions — they gain permissions only when someone or something assumes the role.
+  - 4. Security Model
+    - IAM Users: Higher risk because static keys can leak, be stolen, or be forgotten in code repositories.
+    - IAM Roles: More secure by default thanks to short‑lived credentials, MFA‑protected assumption, and better auditability.
+  - 5. Trust Relationships
+    - IAM Users: Do not use trust policies — they authenticate with their own credentials.
+    - IAM Roles: Use trust policies to define who is allowed to assume the role (users, services, accounts).
+  - 6. Audit & Traceability
+    - IAM Users: Actions are logged under the user’s identity.
+    - IAM Roles: Actions are logged under the role, but CloudTrail shows who assumed the role, improving accountability.
+
+
 > E. Cloud‑Native Application Protection Platforms (CNAPP)
 
 - Effective CNAPP solutions must consolidate capabilities rather than rebrand existing traditional security tools:
@@ -220,6 +208,39 @@ Key Capabilities (from AWS documentation):
   - CrowdStrike Falcon Cloud Security
     - It is a cloud security suite that focuses heavily on workload protection, runtime threat detection, and behavioral analytics. It integrates with the broader Falcon platform, providing unified endpoint and cloud threat intelligence.
 
+> F. List of usefull AWS CLI commands
+ 
+| Amazon Web Service | ACTION | COMMAND | 
+| :-----: | :-----: | :-----: | 
+| STS | Get basic account info | aws sts get-caller-identity | 
+| IAM | List IAM users | aws iam list-users | 
+| IAM | Display the (custom) account password policy | aws iam get-account-password-policy |
+| IAM | Create or change the (custom) account password policy | aws iam update-account-password-policy |
+| IAM | List all MFA devices | aws iam list-mfa-devices | 
+| IAM | List all MFA devices for a IAM user | aws iam list-mfa-devices --user-name username | 
+| IAM | Generate a credential report that lists all users in your account and the status of their various credentials, including passwords, access keys, and MFA devices. | aws iam generate-credential-report | 
+| IAM | View the last credential report that was generated | aws iam get-credential-report | 
+| IAM | List access keys for a user | aws iam list-access-keys --user-name username | 
+| IAM | Backdoor account with second set of access keys | aws iam create-access-key --user-name username | 
+| IAM | List IAM roles | aws iam list-roles | 
+| IAM | Export and brute force all roles for assume role escalation | aws iam list-roles --query 'Roles[].Arn' PIPE-SYMBOL jq -r '.[]' >> rolearns.txt while read r; do echo $r; aws sts assume-role --role-arn $r --role-session-name awshax; done < rolearns.txt | 
+| S3 | List S3 buckets accessible to an account | aws s3 ls | 
+| S3 | List all S3 buckets | aws s3 ls PIPE-SYMBOL awk '{print $3}' >> s3-all-buckets.txt | 
+| S3 | List the contents of an S3 bucket | aws s3 ls s3://bucketname | 
+| S3 | Download contents of a S3 bucket | aws s3 sync s3://bucketname s3-files-dir | 
+| EC2 (VM) | List EC2 instances | aws ec2 describe-instances | 
+| EC2 (VM)| Export all EC2 Instance User Data | while read r; do for instance in $(aws ec2 describe-instances --query 'Reservations[].Instances[].InstanceId' --region $r PIPE-SYMBOL jq -r '.[]'); do aws ec2 describe-instance-attribute --region $r --instance-id $instance --attribute userData >> ec2-instance-userdata.txt; done; done < regions.txt | 
+| EC2 (VM) | List EC2 subnets | aws ec2 describe-subnets | 
+| EC2 (VM) | List EC2 network interfaces | aws ec2 describe-network-interfaces | 
+| EC2 (VM) | Instance Metadata Service URL | http://169.254.169.254/latest/meta-data | 
+| EC2 (VM) | Additional IAM creds possibly available here | http://169.254.169.254/latest/meta-data/iam/security-credentials/IAM-Role-Name | 
+| DirectConnect (VPN) | List DirectConnect (VPN) connections | aws directconnect describe-connections | 
+| RDS | List all RDS Snapshots | aws rds describe-db-snapshots --region us-east-1 --snapshot-type manual --query=DBSnapshots[*].DBSnapshotIdentifier | 
+| Lambda (Serverless) | List Lambda functions | aws lambda list-functions --region region | 
+| Lambda (Serverless) | Look at environment variables set for secrets and analyze code | aws lambda get-function --function-name lambda-function-name | 
+| Lambda (Serverless) | List Lambda functions | aws lambda list-functions --region region | 
+| Kubernetes (EKS) | List EKS clusters | aws eks list-clusters --region region | 
+| Kubernetes (EKS) | Update kubeconfig | aws eks update-kubeconfig --name cluster-name --region region | 
 
 ----------------
 
