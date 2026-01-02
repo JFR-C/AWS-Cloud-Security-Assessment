@@ -19,7 +19,7 @@ Audit & pentest methodology, technical notes, list of tools, scripts and command
 
 ----------------
 
-#### I. AWS Cloud Essentials <i/>(Intro, list of AWS services and AWS CLI commands, CNAPPS, ...)</i>
+#### I. AWS Cloud Essentials 
 
 > A. Introduction
 
