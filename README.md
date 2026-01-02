@@ -11,7 +11,10 @@ Audit & pentest methodology, technical notes, list of tools, scripts and command
   - F. List of usefull AWS CLI commands
 
 - II. AWS Security Audit
-  - A. Run AWS security scans with tools like CloudSuite, Prowler and CloudSploit to identify security misconfiguration.
+  - A. Run AWS security scans with audit tools to identify security misconfiguration
+    - CloudSuite
+    - Prowler
+    - CloudSploit
   - B. Check for known privesc attack vectors in AWS
 
 - III. AWS Penetration Testing
@@ -22,7 +25,7 @@ Audit & pentest methodology, technical notes, list of tools, scripts and command
 
 ### I. AWS Cloud Essentials 
 
-> A. Introduction
+#### A. Introduction
 
 - AWS provides cloud computing i.e. on-demand delivery of technology services through the Internet with pay-as-you-go pricing.
 The AWS Cloud encompasses a broad set of global cloud-based products that includes compute, storage, databases, analytics, networking, mobile, developer tools, management tools, IoT, security, and enterprise applications: on-demand, available in seconds, with pay-as-you-go pricing.
@@ -30,7 +33,7 @@ The AWS Cloud encompasses a broad set of global cloud-based products that includ
 - AWS delivers cloud capabilities through the three service models: Software as a Service (SaaS), Platform as a Service (PaaS), and Infrastructure as a Service (IaaS). 
 These models differ in how much control the customer retains versus how much AWS manages. Understanding these layers helps teams choose the right level of abstraction for their applications, operations, and security responsibilities.
 
-> B. Main AWS services across IaaS, PaaS, and SaaS
+#### B. Main AWS services across IaaS, PaaS, and SaaS
 
 - AWS Cloud - Infrastructure as a Service (IaaS) - These services give raw compute, storage, and networking building blocks.
   - Amazon EC2 — Provides resizable virtual servers in the cloud with full OS‑level control.
@@ -71,7 +74,7 @@ These models differ in how much control the customer retains versus how much AWS
   - ...
 
 
-> C. AWS Security Best Practices
+#### C. AWS Security Best Practices
 
 - Identity & Access Management
   - 1. Secure your AWS account.
@@ -143,7 +146,7 @@ Balancer access logging, to gain visibility into events. Configure logs to flow 
   - 3. Practice responding to events.
     - Simulate and practice incident response by running regular game days, incorporating the lessons learned into your incident management plans, and continuously improving them.
 
-> D. IAM Users vs. IAM Roles — Key Differences
+#### D. IAM Users vs. IAM Roles — Key Differences
   - Credential Type
     - IAM Users: Have long‑lived credentials — passwords and access keys that persist until manually rotated.
     - IAM Roles: Provide temporary credentials issued by STS that automatically expire, reducing risk if compromised.
@@ -164,7 +167,7 @@ Balancer access logging, to gain visibility into events. Configure logs to flow 
     - IAM Roles: Actions are logged under the role, but CloudTrail shows who assumed the role, improving accountability.
 
 
-> E. Cloud‑Native Application Protection Platforms (CNAPP)
+#### E. Cloud‑Native Application Protection Platforms (CNAPP)
 
 - Effective CNAPP solutions must consolidate capabilities rather than rebrand existing traditional security tools:
   - Cloud Security Posture Management (CSPM) - Continuous misconfiguration detection and security posture monitoring
@@ -207,7 +210,7 @@ Key Capabilities (from AWS documentation):
   - CrowdStrike Falcon Cloud Security
     - It is a cloud security suite that focuses heavily on workload protection, runtime threat detection, and behavioral analytics. It integrates with the broader Falcon platform, providing unified endpoint and cloud threat intelligence.
 
-> F. List of usefull AWS CLI commands
+#### F. List of usefull AWS CLI commands
  
 | Amazon Web Service | ACTION | COMMAND | 
 | :-----: | :-----: | :-----: | 
@@ -329,6 +332,7 @@ $ python prowler-cli.py -v
   
 - Usefull ressources:
   - https://github.com/RhinoSecurityLabs/AWS-IAM-Privilege-Escalation
+  - https://rhinosecuritylabs.com/aws/aws-privilege-escalation-methods-mitigation/
   - https://bishopfox.com/blog/5-privesc-attack-vectors-in-aws
   - https://bishopfox.com/blog/privilege-escalation-in-aws
   
@@ -356,7 +360,7 @@ $ python prowler-cli.py -v
   - The permission to create a new policy version allows a user to completely replace the permissions in a policy. If this policy applies to them, this opens the door for the user to just assign themselves full AWS administrative privileges. Attaching a policy or creating a new policy for a user, group, or role can similarly increase the permissions applied to the user.
 
 - IAM policies or trust relationships misconfiguration
-  - Overly permissive trust policies
+  - Overly permissive trust policies <i/>(The trust policy specifies which principals are allowed to use the role - Synonym for AssumeRolePolicy)</i>
       + If a role’s trust policy allows any principal (user, role, or account) to assume it, someone with lower privileges could gain access to a more powerful role.
       + Example:  A role intended for administrators trusts “any AWS principal” instead of a specific role or account. 
   - Wildcard permissions in IAM policies
