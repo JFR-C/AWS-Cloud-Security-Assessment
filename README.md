@@ -1,11 +1,52 @@
 ## AWS Cloud Security Assessment
-Technical notes, audit & pentest methodology, list of tools, scripts and commands that are useful for assessing the security posture of an AWS Cloud environment.<br>
+Audit & pentest methodology, technical notes, list of tools, scripts and commands that are useful for assessing the security posture of an AWS Cloud environment.<br>
 >The output files included here are the results of tools, scripts and commands that I ran against my testing AWS environment and some free CTF/Lab AWS environment. 
 
 ### Table of contents 
 
 
 #### I. AWS Cloud Essentials (Definition, List of commands, ...)
+
+- AWS provides cloud computing i.e. on-demand delivery of technology services through the Internet with pay-as-you-go pricing.
+The AWS Cloud encompasses a broad set of global cloud-based products that includes compute, storage, databases, analytics, networking, mobile, developer tools, management tools, IoT, security, and enterprise applications: on-demand, available in seconds, with pay-as-you-go pricing.
+
+- AWS delivers cloud capabilities through three service models SaaS/PaaS/IaaS: Software as a Service (e;g., Chime, QuickSight), Platform as a Service (e.g., Lambda, Elastic Beanstalk, Fargate, RDS), and Infrastructure as a Service (e.g., EC2, S3, EBS, VPC). 
+These models differ in how much control the customer retains versus how much AWS manages. Understanding these layers helps teams choose the right level of abstraction for their applications, operations, and security responsibilities.
+
+
+- Infrastructure as a Service (IaaS) - These AWS services give raw compute, storage, and networking building blocks.
+  - Amazon EC2 — Provides resizable virtual servers in the cloud with full OS‑level control.
+  - Amazon S3 — Offers highly durable, scalable object storage for any type of data.
+  - Amazon EBS — Delivers block‑level storage volumes for EC2 instances.
+  - Amazon VPC — Lets you create isolated virtual networks with full control over routing and security.
+  - Elastic Load Balancing (ELB) — Automatically distributes incoming traffic across multiple compute resources.
+  - Amazon Route 53 — A scalable DNS and domain management service.
+  - AWS IAM — Provides identity and access control for AWS resources.
+  - Amazon EFS — A fully managed, scalable file storage system for Linux workloads.
+  - AWS Direct Connect — Establishes dedicated network connections between your data center and AWS.
+  - ...
+
+- Platform as a Service (PaaS) - These AWS services abstract away infrastructure so user can focus on code and applications.
+  - AWS Lambda — Runs your code without provisioning or managing servers.
+  - AWS Elastic Beanstalk — Automatically deploys and manages applications using preconfigured environments.
+  - Amazon RDS — Provides managed relational databases with automated backups and patching.
+  - Amazon Aurora — A high‑performance, fully managed relational database compatible with MySQL and PostgreSQL.
+  - AWS Fargate — Runs containers without managing servers or clusters.
+  - Amazon API Gateway — Creates, manages, and secures APIs at scale.
+  - Amazon DynamoDB — A fully managed NoSQL database with single‑digit millisecond performance.
+  - Amazon SQS — A managed message queuing service for decoupling distributed systems.
+  - Amazon SNS — A pub/sub messaging service for event notifications.
+  - ...
+
+- Software as a Service (SaaS) - These are fully managed applications delivered directly to end users.
+  - Amazon Chime — A cloud‑based communications service for meetings, chat, and video conferencing.
+  - Amazon QuickSight — A fully managed business intelligence service for dashboards and analytics.
+  - Amazon WorkMail — A secure, managed business email and calendaring service.
+  - Amazon WorkDocs — A cloud‑based document storage and collaboration platform.
+  - AWS Managed Services (AMS) — Provides ongoing operations management for enterprise AWS environments.
+  - AWS IoT Device Management — A fully managed service for onboarding and managing IoT devices at scale.
+  - Amazon Connect — A cloud‑based contact center platform for customer service operations.
+  - ...
 
 - List of usefull AWS CLI commands
  
@@ -45,7 +86,7 @@ Technical notes, audit & pentest methodology, list of tools, scripts and command
 
 #### II. AWS Security Assessement
 
-- Using an AWS account run tools and scripts that will extact and analyse the AWS environement looking for potential security misconfiguration, and other security issues in key services such as:
+- Using an AWS account run tools and scripts that will extract and analyse the AWS environment looking for potential security misconfiguration, and other security issues in key services such as:
   - IAM
   - EC2
   - Lambda
