@@ -25,13 +25,17 @@ Technical notes, audit & pentest methodology, list of tools, scripts and command
 | EC2 (VM)| Export all EC2 Instance User Data | while read r; do for instance in $(aws ec2 describe-instances --query 'Reservations[].Instances[].InstanceId' --region $r PIPE-SYMBOL jq -r '.[]'); do aws ec2 describe-instance-attribute --region $r --instance-id $instance --attribute userData >> ec2-instance-userdata.txt; done; done < regions.txt | 
 | EC2 (VM) | List EC2 subnets | aws ec2 describe-subnets | 
 | EC2 (VM) | List EC2 network interfaces | aws ec2 describe-network-interfaces | 
+| EC2 (VM) | Instance Metadata Service URL | http://169.254.169.254/latest/meta-data | 
+| EC2 (VM) | Additional IAM creds possibly available here | http://169.254.169.254/latest/meta-data/iam/security-credentials/IAM-Role-Name | 
 | DirectConnect (VPN) | List DirectConnect (VPN) connections | aws directconnect describe-connections | 
+| RDS | List all RDS Snapshots | aws rds describe-db-snapshots --region us-east-1 --snapshot-type manual --query=DBSnapshots[*].DBSnapshotIdentifier | 
 | Lambda (Serverless) | List Lambda functions | aws lambda list-functions --region region | 
 | Lambda (Serverless) | Look at environment variables set for secrets and analyze code | aws lambda get-function --function-name lambda-function-name | 
 | Lambda (Serverless) | List Lambda functions | aws lambda list-functions --region region | 
 | Kubernetes (EKS) | List EKS clusters | aws eks list-clusters --region region | 
 | Kubernetes (EKS) | Update kubeconfig | aws eks update-kubeconfig --name cluster-name --region region | 
-
+  
+  
 
 #### II. AWS Security Assessement
 
