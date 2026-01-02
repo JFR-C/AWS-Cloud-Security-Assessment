@@ -7,14 +7,17 @@ Audit & pentest methodology, technical notes, list of tools, scripts and command
 
 #### I. AWS Cloud Essentials (Definition, List of commands, ...)
 
+> A. Introduction
+
 - AWS provides cloud computing i.e. on-demand delivery of technology services through the Internet with pay-as-you-go pricing.
 The AWS Cloud encompasses a broad set of global cloud-based products that includes compute, storage, databases, analytics, networking, mobile, developer tools, management tools, IoT, security, and enterprise applications: on-demand, available in seconds, with pay-as-you-go pricing.
 
-- AWS delivers cloud capabilities through three service models SaaS/PaaS/IaaS: Software as a Service (e;g., Chime, QuickSight), Platform as a Service (e.g., Lambda, Elastic Beanstalk, Fargate, RDS), and Infrastructure as a Service (e.g., EC2, S3, EBS, VPC). 
+- AWS delivers cloud capabilities through the three service models: Software as a Service (SaaS), Platform as a Service (PaaS), and Infrastructure as a Service (IaaS). 
 These models differ in how much control the customer retains versus how much AWS manages. Understanding these layers helps teams choose the right level of abstraction for their applications, operations, and security responsibilities.
 
+> B. List of the main AWS services across IaaS, PaaS, and SaaS
 
-- Infrastructure as a Service (IaaS) - These AWS services give raw compute, storage, and networking building blocks.
+- AWS Cloud - Infrastructure as a Service (IaaS) - These services give raw compute, storage, and networking building blocks.
   - Amazon EC2 — Provides resizable virtual servers in the cloud with full OS‑level control.
   - Amazon S3 — Offers highly durable, scalable object storage for any type of data.
   - Amazon EBS — Delivers block‑level storage volumes for EC2 instances.
@@ -26,7 +29,7 @@ These models differ in how much control the customer retains versus how much AWS
   - AWS Direct Connect — Establishes dedicated network connections between your data center and AWS.
   - ...
 
-- Platform as a Service (PaaS) - These AWS services abstract away infrastructure so user can focus on code and applications.
+- AWS Cloud - Platform as a Service (PaaS) - These services abstract away infrastructure so user can focus on code and applications.
   - AWS Lambda — Runs your code without provisioning or managing servers.
   - AWS Elastic Beanstalk — Automatically deploys and manages applications using preconfigured environments.
   - Amazon RDS — Provides managed relational databases with automated backups and patching.
@@ -38,7 +41,7 @@ These models differ in how much control the customer retains versus how much AWS
   - Amazon SNS — A pub/sub messaging service for event notifications.
   - ...
 
-- Software as a Service (SaaS) - These are fully managed applications delivered directly to end users.
+- AWS Cloud - Software as a Service (SaaS) - These are fully managed applications delivered directly to end users.
   - Amazon Chime — A cloud‑based communications service for meetings, chat, and video conferencing.
   - Amazon QuickSight — A fully managed business intelligence service for dashboards and analytics.
   - Amazon WorkMail — A secure, managed business email and calendaring service.
@@ -48,7 +51,7 @@ These models differ in how much control the customer retains versus how much AWS
   - Amazon Connect — A cloud‑based contact center platform for customer service operations.
   - ...
 
-- List of usefull AWS CLI commands
+> C. List of usefull AWS CLI commands
  
 | Amazon Web Service | ACTION | COMMAND | 
 | :-----: | :-----: | :-----: | 
@@ -82,7 +85,7 @@ These models differ in how much control the customer retains versus how much AWS
 | Kubernetes (EKS) | List EKS clusters | aws eks list-clusters --region region | 
 | Kubernetes (EKS) | Update kubeconfig | aws eks update-kubeconfig --name cluster-name --region region | 
   
-  
+----------------
 
 #### II. AWS Security Assessement
 
@@ -94,9 +97,8 @@ These models differ in how much control the customer retains versus how much AWS
 
 - CloudSploit by Aqua - Cloud Security Scans - [CloudSploit](https://github.com/aquasecurity/cloudsploit) - It is an open-source project designed to allow detection of security risks in cloud infrastructure accounts, including: Amazon Web Services (AWS), Microsoft Azure, Google Cloud Platform (GCP), Oracle Cloud Infrastructure (OCI), and GitHub. These scripts are designed to return a series of potential misconfigurations and security risks.
 
+----------------
+
 #### III. AWS Penetration Testing
 
 
-
-
-List S3 buckets accessible to an account
