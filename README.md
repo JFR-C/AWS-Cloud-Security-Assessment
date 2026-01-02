@@ -7,7 +7,7 @@ Audit & pentest methodology, technical notes, list of tools, scripts and command
   - A. Introduction
   - B. Main AWS services across IaaS, PaaS, and SaaS
   - C. List of usefull AWS CLI commands
-  - D. AWS Security Checklist (from AWS)
+  - D. AWS Security Checklist & Best Practices
   - E. Cloud‑Native Application Protection Platforms (CNAPP)
 
 - II. AWS Security Audit
@@ -105,7 +105,7 @@ These models differ in how much control the customer retains versus how much AWS
 | Kubernetes (EKS) | Update kubeconfig | aws eks update-kubeconfig --name cluster-name --region region | 
 
 
-> D. AWS Security Checklist (from AWS)
+> D. AWS Security Checklist & Best Practices
 
 - Identity & Access Management
   - 1. Secure your AWS account.
@@ -117,6 +117,18 @@ These models differ in how much control the customer retains versus how much AWS
   - 4. Store and use secrets securely.
     - Where you cannot use temporary credentials, like tokens from AWS Security Token Service, store your secrets like database passwords using AWS Secrets Manager which handles encryption, rotation, and access control.
 
+- Role Management
+  - 1. Apply least‑privilege permissions and use IAM roles instead of long‑lived IAM users  
+    - Grant only the minimum permissions required for each role and rely on temporary credentials through IAM roles to eliminate static access keys.
+  - 2. Enforce strong separation of duties with role‑based access control (RBAC)  
+    - Create distinct roles for administration, deployment, monitoring, and automation so no single role has excessive or overlapping privileges.
+  - 3. Use IAM Access Analyzer and IAM policy validation to detect overly permissive roles  
+    - Continuously analyze trust policies and permissions to identify roles that allow unintended external access or wildcard permissions.
+  - 4. Enable role session tagging and logging for traceability and accountability  
+    - Use CloudTrail and session tags to track who assumed which role, when, and for what purpose, strengthening auditability and incident response.
+  - 5. Manage the usage and risks of assumed roles by restricting who can assume them and monitoring cross‑account trust relationships
+    - Overly broad trust policies or permissive 'sts:AssumeRole' permissions can allow unintended access paths, privilege escalation, or unauthorized lateral movement across accounts. Regularly review trust policies, enforce MFA‑protected role assumption, and monitor CloudTrail for unusual or high‑risk role‑assumption patterns.
+
 - Infrastructure Protection
   - 1. Patch your operating system, applications, and code.
     - Use AWS Systems Manager Patch Manager to automate the patching process of all systems and code for which you are responsible, including your OS, applications, and code dependencies.
@@ -124,6 +136,21 @@ These models differ in how much control the customer retains versus how much AWS
     - Use Amazon Cloudfront, AWS WAF and AWS Shield to provide layer 7 and layer 3/layer 4 DDoS protection.
   - 3. Control access using VPC Security Groups and subnet layers.
     - Use security groups for controlling inbound and outbound traffic, and automatically apply rules for both security groups and WAFs using AWS Firewall Manager. Group different resources into different subnets to create routing layers, for example database resources do not need a route to the internet.
+
+- Network Security
+  - 1. Enforce least‑privilege network access using Security Groups and NACLs  
+    - Design inbound and outbound rules so that only required ports, protocols, and sources are allowed, and segment workloads into separate security groups to minimize lateral movement.
+    - Security Groups are stateful virtual firewalls that control inbound and outbound traffic at the instance or ENI level, enforcing least‑privilege access to workloads.
+    - Network ACLs (NACLs) are stateless subnet‑level firewalls that provide an additional layer of network filtering, allowing or denying traffic before it reaches resources.
+  - 2. Eliminate public exposure by using private subnets, VPC Endpoints, and AWS PrivateLink  
+    - Keep databases, internal services, and sensitive workloads off the public internet, and route traffic to AWS services privately to reduce attack surface.
+    - VPC (Virtual Private Cloud) is a logically isolated section of the AWS Cloud where you define your own IP ranges, subnets, routing, and network boundaries, forming the foundation of AWS network security.
+    - PrivateLink & VPC Endpoints allow to securely connect to AWS services or third‑party SaaS without exposing traffic to the public internet, reducing attack surface.
+  - 3. Implement multi‑layered perimeter protection with AWS WAF, Shield, and Network Firewall  
+    - Use WAF to filter malicious HTTP/S traffic, Shield to mitigate DDoS attacks, and Network Firewall for deep packet inspection and centralized rule enforcement across VPCs.
+  - 4. Continuously monitor and analyze network activity with VPC Flow Logs and GuardDuty  
+    - Capture flow logs for visibility into traffic patterns and anomalies, and rely on GuardDuty to detect suspicious behavior such as port scanning, unusual API calls, or compromised instances.
+    - Amazon GuardDuty is a threat detection service that analyzes VPC Flow Logs, DNS logs, and CloudTrail events to identify suspicious or malicious activity in your network.
 
 - Data Protection
   - 1. Protect data at rest.
@@ -149,7 +176,6 @@ Balancer access logging, to gain visibility into events. Configure logs to flow 
     - Begin with GuardDuty findings. Turn on GuardDuty and ensure that someone with the ability to take action receives the notifications. Automatically creating trouble tickets is the best way to ensure that GuardDuty findings are integrated with your operational processes.
   - 3. Practice responding to events.
     - Simulate and practice incident response by running regular game days, incorporating the lessons learned into your incident management plans, and continuously improving them.
-  
 
 > E. Cloud‑Native Application Protection Platforms (CNAPP)
 
