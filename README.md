@@ -1,6 +1,5 @@
 ## AWS Cloud Security Assessment
 Audit & pentest methodology, technical notes, list of tools, scripts and commands that are useful for assessing the security posture of an AWS Cloud environment.<br>
->The output files included here are the results of tools, scripts and commands that I ran against my testing AWS environment and some free CTF/Lab AWS environment. 
 
 ### Table of contents 
 - I. AWS Cloud Essentials  
@@ -12,8 +11,8 @@ Audit & pentest methodology, technical notes, list of tools, scripts and command
   - F. List of usefull AWS CLI commands
 
 - II. AWS Security Audit
-  - A.
-  - B.
+  - A. Run AWS security scans with tools like CloudSuite, Prowler and CloudSploit to identify security misconfiguration.
+  - B. Check for known privesc attack vectors in AWS
 
 - III. AWS Penetration Testing
   - A. Black-box penetration test (we start with no account)
@@ -21,7 +20,7 @@ Audit & pentest methodology, technical notes, list of tools, scripts and command
 
 ----------------
 
-#### I. AWS Cloud Essentials 
+### I. AWS Cloud Essentials 
 
 > A. Introduction
 
@@ -244,65 +243,119 @@ Key Capabilities (from AWS documentation):
 
 ----------------
 
-#### II. AWS SECURITY AUDIT
+### II. AWS SECURITY AUDIT
 
-- Using an AWS account run tools and scripts that will extract and analyse the AWS environment looking for potential security misconfiguration, and other security issues in key services such as:
-  - IAM
-  - EC2
-  - Lambda
-  - ...
- 
-- Known Privesc Attack Vectors in AWS
-  - IAM Permissions on Other Users  
-    - The following user account and group permissions can all be used to escalate privileges:
-       + <i/> iam:CreateAccessKey </i>
-       + <i/> iam:CreateLoginProfile </i>
-       + <i/> iam:UpdateLoginProfile </i>
-       + <i/> iam:AddUserToGroup </i>  
-    - Using a blacklist instead of a whitelist approach could leave the door open for users to escalate their privileges. This is especially true if a wildcard is used under the Resource section, because that means the user can take these actions for any group, policy, role, or other user account. Some ways that these permissions could allow privilege escalation include:
-       + A user adding their own account to an Admin group
-       + A user creating a new API key for a more privileged user account
-       + A user updating the account password for a more privileged user account
+#### A. Run AWS security scans with tools like CloudSuite, Prowler and CloudSploit.
+- Using an AWS account run tools and scripts that will extract and analyse the AWS environment looking for potential security misconfiguration, and other security issues in key services such as IAM, EC2, Lambda and S3.
+
+- Minimum Roles & Privileges for AWS Security Audit Tools (General Guidance)
+  - All major audit tools recommend using a read‑only IAM role that the tool assumes. This role typically includes:
+    + 'SecurityAudit' AWS managed policy
+    + 'ReadOnlyAccess' AWS managed policy (optional but common)
+  - Some tools check services that the 'SecurityAudit' policy doesn’t fully cover and may require extra read‑only permissions such as:
+    + iam:Get*, iam:List*
+    + ec2:Describe*
+    + s3:GetBucketPolicy, s3:GetEncryptionConfiguration
+    + cloudtrail:DescribeTrails, cloudtrail:GetEventSelectors
+    + config:Describe*
+    + kms:ListKeys, kms:DescribeKey
+
+- AWS Security Audit Tool n°1 - [CLOUDSPLOIT](https://github.com/aquasecurity/cloudsploit) 
+  - It is an open-source project designed to allow detection of security risks in cloud infrastructure accounts, including: Amazon Web Services (AWS), Microsoft Azure, Google Cloud Platform (GCP), Oracle Cloud Infrastructure (OCI), and GitHub. These scripts are designed to return a series of potential misconfigurations and security risks.
+```
+Docker
+------
+$ git clone https://github.com/aquasecurity/cloudsploit.git
+$ cd cloudsploit
+$ docker build . -t cloudsploit:0.0.1
+$ docker run cloudsploit:0.0.1 -h
+$ docker run -e AWS_ACCESS_KEY_ID=XX -e AWS_SECRET_ACCESS_KEY=YY cloudsploit:0.0.1 --compliance=pci
+```
+
+- AWS Security Audit Tool n°2 - [SCOUTSUITE](https://github.com/nccgroup/ScoutSuite)  
+  - Scout Suite is an open source multi-cloud security-auditing tool, which enables security posture assessment of cloud environments. Using the APIs exposed by cloud providers, Scout Suite gathers configuration data for manual inspection and highlights risk areas. Rather than going through dozens of pages on the web consoles, Scout Suite presents a clear view of the attack surface automatically.
+  - Scout Suite was designed by security consultants/auditors. It is meant to provide a point-in-time security-oriented view of the cloud account it was run in. Once the data has been gathered, all usage may be performed offline.
+```
+Install via Git
+----------------
+$ git clone https://github.com/nccgroup/ScoutSuite
+$ cd ScoutSuite
+$ virtualenv -p python3 venv
+$ source venv/bin/activate
+$ pip install -r requirements.txt
+$ python scout.py --help
+```
+```
+Install via PIP
+----------------
+$ virtualenv -p python3 venv
+$ source venv/bin/activate
+$ pip install scoutsuite
+$ scout --help
+```
+```
+Run
+---
+$  python scout.py aws --profile basc -f
+```
+
+#### B. Check for known privesc attack vectors in AWS
+  
+- Usefull ressources:
+  - https://github.com/RhinoSecurityLabs/AWS-IAM-Privilege-Escalation
+  - https://bishopfox.com/blog/5-privesc-attack-vectors-in-aws
+  - https://bishopfox.com/blog/privilege-escalation-in-aws
+  
+- IAM Permissions on Other Users  
+  - The following user account and group permissions can all be used to escalate privileges:
+      + <i/> iam:CreateAccessKey </i>
+      + <i/> iam:CreateLoginProfile </i>
+      + <i/> iam:UpdateLoginProfile </i>
+      + <i/> iam:AddUserToGroup </i>  
+  - Using a blacklist instead of a whitelist approach could leave the door open for users to escalate their privileges. This is especially true if a wildcard is used under the Resource section, because that means the user can take these actions for any group, policy, role, or other user account. Some ways that these permissions could allow privilege escalation include:
+      + A user adding their own account to an Admin group
+      + A user creating a new API key for a more privileged user account
+      + A user updating the account password for a more privileged user account
      
-  - Permissions on Policies
-    - The following policy permissions can lead to privilege escalation:
-       + <i/> iam:CreatePolicyVersion </i>
-       + <i/> iam:SetDefaultPolicyVersion </i>
-       + <i/> iam:AttachUserPolicy </i>
-       + <i/> iam:AttachGroupPolicy </i>
-       + <i/> iam:AttachRolePolicy </i>
-       + <i/> iam:PutUserPolicy </i>
-       + <i/> iam:PutGroupPolicy </i>
-       + <i/> iam:PutRolePolicy </i>
-    - The permission to create a new policy version allows a user to completely replace the permissions in a policy. If this policy applies to them, this opens the door for the user to just assign themselves full AWS administrative privileges. Attaching a policy or creating a new policy for a user, group, or role can similarly increase the permissions applied to the user.
+- Permissions on Policies
+  - The following policy permissions can lead to privilege escalation:
+      + <i/> iam:CreatePolicyVersion </i>
+      + <i/> iam:SetDefaultPolicyVersion </i>
+      + <i/> iam:AttachUserPolicy </i>
+      + <i/> iam:AttachGroupPolicy </i>
+      + <i/> iam:AttachRolePolicy </i>
+      + <i/> iam:PutUserPolicy </i>
+      + <i/> iam:PutGroupPolicy </i>
+      + <i/> iam:PutRolePolicy </i>
+  - The permission to create a new policy version allows a user to completely replace the permissions in a policy. If this policy applies to them, this opens the door for the user to just assign themselves full AWS administrative privileges. Attaching a policy or creating a new policy for a user, group, or role can similarly increase the permissions applied to the user.
 
-  - IAM policies or trust relationships misconfiguration
-    - Overly permissive trust policies
-       + If a role’s trust policy allows any principal (user, role, or account) to assume it, someone with lower privileges could gain access to a more powerful role.
-       + Example:  A role intended for administrators trusts “any AWS principal” instead of a specific role or account. 
-    - Wildcard permissions in IAM policies
-       + If a user or role has permissions like 'sts:AssumeRole' with wildcards, they may be able to assume roles that grant more privileges than intended.
+- IAM policies or trust relationships misconfiguration
+  - Overly permissive trust policies
+      + If a role’s trust policy allows any principal (user, role, or account) to assume it, someone with lower privileges could gain access to a more powerful role.
+      + Example:  A role intended for administrators trusts “any AWS principal” instead of a specific role or account. 
+  - Wildcard permissions in IAM policies
+      + If a user or role has permissions like 'sts:AssumeRole' with wildcards, they may be able to assume roles that grant more privileges than intended.
 
-  - Updating an AssumeRolePolicy
-    - The 'iam:UpdateAssumeRolePolicy' permission provides an entity with the ability to change a role’s AssumeRolePolicy. So, if a user is not included in this policy but they have the ability to update it, they can just add their user account to the AssumeRolePolicy and consequently assume the role. Depending on the permissions associated with the role, this could provide a path for privilege escalation.
+- Updating an AssumeRolePolicy
+  - The 'iam:UpdateAssumeRolePolicy' permission provides an entity with the ability to change a role’s AssumeRolePolicy. So, if a user is not included in this policy but they have the ability to update it, they can just add their user account to the AssumeRolePolicy and consequently assume the role. Depending on the permissions associated with the role, this could provide a path for privilege escalation.
    
-  - 'iam:PassRole:*'
-    - The 'iam:PassRole' permission allows a user to pass a role to an AWS entity. Passing roles is a crucial element in AWS permissions and resource management. For instance, when deploying an application to AWS, the application may need to perform certain actions on the back end, such as accessing databases or running Lambda functions. In order to allow the application to access these AWS services, you pass a role to it that contains the necessary permissions.
-    - Problems with the 'iam:PassRole' permission occur when there is no defined role or set of roles that the principal is allowed to pass. For instance, policies that allow the use of iam:PassRole on wildcard resources (iam:PassRole:*). In effect, this allows the user to pass any role that exists in the environment, including any existing privileged roles. This may open up the possibility for a user to pass a privileged role to an AWS resource or service, and then use that resource or service to perform privileged actions.
+- 'iam:PassRole:*'
+  - The 'iam:PassRole' permission allows a user to pass a role to an AWS entity. Passing roles is a crucial element in AWS permissions and resource management. For instance, when deploying an application to AWS, the application may need to perform certain actions on the back end, such as accessing databases or running Lambda functions. In order to allow the application to access these AWS services, you pass a role to it that contains the necessary permissions.
+  - Problems with the 'iam:PassRole' permission occur when there is no defined role or set of roles that the principal is allowed to pass. For instance, policies that allow the use of iam:PassRole on wildcard resources (iam:PassRole:*). In effect, this allows the user to pass any role that exists in the environment, including any existing privileged roles. This may open up the possibility for a user to pass a privileged role to an AWS resource or service, and then use that resource or service to perform privileged actions.
 
-  - Privilege Escalation Using AWS Services
-    - It’s possible in some cases to escalate privileges using an AWS service. Lambda and Glue are two services that may allow users to execute commands that they should not be able to execute, and CloudFormation and Data Pipeline may be used for privesc as well if the user also has the iam:PassRole permission.
-    - For Lambda, just having the permission to modify functions can lead to privilege escalation because a user can update a Lambda function to perform privileged actions on their behalf. The risk here depends on the permissions with which the Lambda function operates.
-    - Similarly, the permission to modify a Glue development endpoint can lead to privilege escalation because a user might, for example, change the SSH key associated with an endpoint so they can then log into the system and use it to perform privileged actions. Again, the risk depends on the permissions assigned to the endpoint.
+- Privilege Escalation Using AWS Services
+  - It’s possible in some cases to escalate privileges using an AWS service. Lambda and Glue are two services that may allow users to execute commands that they should not be able to execute, and CloudFormation and Data Pipeline may be used for privesc as well if the user also has the iam:PassRole permission.
+  - For Lambda, just having the permission to modify functions can lead to privilege escalation because a user can update a Lambda function to perform privileged actions on their behalf. The risk here depends on the permissions with which the Lambda function operates.
+  - Similarly, the permission to modify a Glue development endpoint can lead to privilege escalation because a user might, for example, change the SSH key associated with an endpoint so they can then log into the system and use it to perform privileged actions. Again, the risk depends on the permissions assigned to the endpoint.
    
 
-- CloudSploit by Aqua - Cloud Security Scans - [CloudSploit](https://github.com/aquasecurity/cloudsploit) - It is an open-source project designed to allow detection of security risks in cloud infrastructure accounts, including: Amazon Web Services (AWS), Microsoft Azure, Google Cloud Platform (GCP), Oracle Cloud Infrastructure (OCI), and GitHub. These scripts are designed to return a series of potential misconfigurations and security risks.
+
 
 ----------------
 
-#### III. AWS PENETRATION TESTING
+### III. AWS PENETRATION TESTING
 
-1. Black-box penetration test (we start with no account)
-2. Grey-box penetration test (we start with 1 low-privileged Windows account)
+#### A. Black-box penetration test (we start with no account)
+#### B. Grey-box penetration test (we start with 1 low-privileged Windows account)
 
 
