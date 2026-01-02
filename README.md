@@ -27,9 +27,10 @@ Technical notes, audit & pentest methodology, list of tools, scripts and command
 | EC2 (VM) | List EC2 network interfaces | aws ec2 describe-network-interfaces | 
 | DirectConnect (VPN) | List DirectConnect (VPN) connections | aws directconnect describe-connections | 
 | Lambda (Serverless) | List Lambda functions | aws lambda list-functions --region region | 
-| Lambda (Serverless) | Look at environment variables set for secrets and analyze code PIPE-SYMBOL aws lambda get-function --function-name lambda-function-name | 
+| Lambda (Serverless) | Look at environment variables set for secrets and analyze code | aws lambda get-function --function-name lambda-function-name | 
 | Lambda (Serverless) | List Lambda functions | aws lambda list-functions --region region | 
 | Kubernetes (EKS) | List EKS clusters | aws eks list-clusters --region region | 
+| Kubernetes (EKS) | Update kubeconfig | aws eks update-kubeconfig --name cluster-name --region region | 
 
 
 #### II. AWS Security Assessement
