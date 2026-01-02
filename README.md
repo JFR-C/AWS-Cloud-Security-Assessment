@@ -145,22 +145,22 @@ Balancer access logging, to gain visibility into events. Configure logs to flow 
     - Simulate and practice incident response by running regular game days, incorporating the lessons learned into your incident management plans, and continuously improving them.
 
 > D. IAM Users vs. IAM Roles — Key Differences
-  - 1. Credential Type
+  - Credential Type
     - IAM Users: Have long‑lived credentials — passwords and access keys that persist until manually rotated.
     - IAM Roles: Provide temporary credentials issued by STS that automatically expire, reducing risk if compromised.
-  - 2. Intended Use
+  - Intended Use
     - IAM Users: Designed for human access (admins, developers) who need console login or programmatic access.
     - IAM Roles: Designed for AWS services, applications, and cross‑account access — not for direct login.
-  - 3. How Access Is Granted
+  - How Access Is Granted
     - IAM Users: Are directly assigned permissions via policies attached to the user or their groups.
     - IAM Roles: Have no inherent permissions — they gain permissions only when someone or something assumes the role.
-  - 4. Security Model
+  - Security Model
     - IAM Users: Higher risk because static keys can leak, be stolen, or be forgotten in code repositories.
     - IAM Roles: More secure by default thanks to short‑lived credentials, MFA‑protected assumption, and better auditability.
-  - 5. Trust Relationships
+  - Trust Relationships
     - IAM Users: Do not use trust policies — they authenticate with their own credentials.
     - IAM Roles: Use trust policies to define who is allowed to assume the role (users, services, accounts).
-  - 6. Audit & Traceability
+  - Audit & Traceability
     - IAM Users: Actions are logged under the user’s identity.
     - IAM Roles: Actions are logged under the role, but CloudTrail shows who assumed the role, improving accountability.
 
@@ -250,7 +250,51 @@ Key Capabilities (from AWS documentation):
   - IAM
   - EC2
   - Lambda
-  - ...  
+  - ...
+ 
+- Known Privesc Attack Vectors in AWS
+  - IAM Permissions on Other Users  
+    - The following user account and group permissions can all be used to escalate privileges:
+       + <i/> iam:CreateAccessKey </i>
+       + <i/> iam:CreateLoginProfile </i>
+       + <i/> iam:UpdateLoginProfile </i>
+       + <i/> iam:AddUserToGroup </i>  
+    - Using a blacklist instead of a whitelist approach could leave the door open for users to escalate their privileges. This is especially true if a wildcard is used under the Resource section, because that means the user can take these actions for any group, policy, role, or other user account. Some ways that these permissions could allow privilege escalation include:
+       + A user adding their own account to an Admin group
+       + A user creating a new API key for a more privileged user account
+       + A user updating the account password for a more privileged user account
+     
+  - Permissions on Policies
+    - The following policy permissions can lead to privilege escalation:
+       + <i/> iam:CreatePolicyVersion </i>
+       + <i/> iam:SetDefaultPolicyVersion </i>
+       + <i/> iam:AttachUserPolicy </i>
+       + <i/> iam:AttachGroupPolicy </i>
+       + <i/> iam:AttachRolePolicy </i>
+       + <i/> iam:PutUserPolicy </i>
+       + <i/> iam:PutGroupPolicy </i>
+       + <i/> iam:PutRolePolicy </i>
+    - The permission to create a new policy version allows a user to completely replace the permissions in a policy. If this policy applies to them, this opens the door for the user to just assign themselves full AWS administrative privileges. Attaching a policy or creating a new policy for a user, group, or role can similarly increase the permissions applied to the user.
+
+  - IAM policies or trust relationships misconfiguration
+    - Overly permissive trust policies
+       + If a role’s trust policy allows any principal (user, role, or account) to assume it, someone with lower privileges could gain access to a more powerful role.
+       + Example:  A role intended for administrators trusts “any AWS principal” instead of a specific role or account. 
+    - Wildcard permissions in IAM policies
+       + If a user or role has permissions like 'sts:AssumeRole' with wildcards, they may be able to assume roles that grant more privileges than intended.
+
+  - Updating an AssumeRolePolicy
+    - The 'iam:UpdateAssumeRolePolicy' permission provides an entity with the ability to change a role’s AssumeRolePolicy. So, if a user is not included in this policy but they have the ability to update it, they can just add their user account to the AssumeRolePolicy and consequently assume the role. Depending on the permissions associated with the role, this could provide a path for privilege escalation.
+   
+  - 'iam:PassRole:*'
+    - The 'iam:PassRole' permission allows a user to pass a role to an AWS entity. Passing roles is a crucial element in AWS permissions and resource management. For instance, when deploying an application to AWS, the application may need to perform certain actions on the back end, such as accessing databases or running Lambda functions. In order to allow the application to access these AWS services, you pass a role to it that contains the necessary permissions.
+    - Problems with the 'iam:PassRole' permission occur when there is no defined role or set of roles that the principal is allowed to pass. For instance, policies that allow the use of iam:PassRole on wildcard resources (iam:PassRole:*). In effect, this allows the user to pass any role that exists in the environment, including any existing privileged roles. This may open up the possibility for a user to pass a privileged role to an AWS resource or service, and then use that resource or service to perform privileged actions.
+
+  - Privilege Escalation Using AWS Services
+    - It’s possible in some cases to escalate privileges using an AWS service. Lambda and Glue are two services that may allow users to execute commands that they should not be able to execute, and CloudFormation and Data Pipeline may be used for privesc as well if the user also has the iam:PassRole permission.
+    - For Lambda, just having the permission to modify functions can lead to privilege escalation because a user can update a Lambda function to perform privileged actions on their behalf. The risk here depends on the permissions with which the Lambda function operates.
+    - Similarly, the permission to modify a Glue development endpoint can lead to privilege escalation because a user might, for example, change the SSH key associated with an endpoint so they can then log into the system and use it to perform privileged actions. Again, the risk depends on the permissions assigned to the endpoint.
+   
 
 - CloudSploit by Aqua - Cloud Security Scans - [CloudSploit](https://github.com/aquasecurity/cloudsploit) - It is an open-source project designed to allow detection of security risks in cloud infrastructure accounts, including: Amazon Web Services (AWS), Microsoft Azure, Google Cloud Platform (GCP), Oracle Cloud Infrastructure (OCI), and GitHub. These scripts are designed to return a series of potential misconfigurations and security risks.
 
