@@ -349,8 +349,7 @@ cat /mnt/home/ubuntu/setupNginx.sh
 | Amazon Web Service | ACTION | COMMAND | 
 | :-----: | :-----: | :-----: | 
 | STS | Get basic account info | aws sts get-caller-identity | 
-| STS | Show the AWS account ID, IAM user/role, and ARN associated with the provided profile. It returns the identity whose credentials are being used, which includes
-IAM user, IAM role, assumed role (including EC2 instance profiles) | aws --profile test sts get-caller-identity | 
+| STS | Show the AWS account ID, IAM user/role, and ARN associated with the provided profile. It returns the identity whose credentials are being used, which includes IAM user, IAM role, assumed role (including EC2 instance profiles) | aws --profile test sts get-caller-identity | 
 | STS | Request temporary STS session credentials | aws sts get-session-token | 
 | STS | Check which AWS account an access key belongs to | aws sts get-access-key-info --access-key-id=XXXXXXXXX | 
 | IAM | List IAM users | aws iam list-users | 
@@ -412,8 +411,8 @@ IAM user, IAM role, assumed role (including EC2 instance profiles) | aws --profi
 
 #### A. Run AWS security scans with tools like CloudSuite, Prowler and CloudSploit.
 - Using an AWS account run tools and scripts that will extract and analyse the AWS environment looking for potential security misconfiguration, and other security issues in key services such as IAM, EC2, Lambda and S3.
-
 - Minimum Roles & Privileges for AWS Security Audit Tools (General Guidance)
+  ```
   - All major audit tools recommend using a read‑only IAM role that the tool assumes. This role typically includes:
     + 'SecurityAudit' AWS managed policy
     + 'ReadOnlyAccess' AWS managed policy (optional but common)
@@ -424,71 +423,71 @@ IAM user, IAM role, assumed role (including EC2 instance profiles) | aws --profi
     + cloudtrail:DescribeTrails, cloudtrail:GetEventSelectors
     + config:Describe*
     + kms:ListKeys, kms:DescribeKey
-
+  ```
 - Security Audit Tool n°1 - [CLOUDSPLOIT](https://github.com/aquasecurity/cloudsploit) 
   - It is an open-source project designed to allow detection of security risks in cloud infrastructure accounts, including: Amazon Web Services (AWS), Microsoft Azure, Google Cloud Platform (GCP), Oracle Cloud Infrastructure (OCI), and GitHub. These scripts are designed to return a series of potential misconfigurations and security risks.
-```
-Docker
-------
-$ git clone https://github.com/aquasecurity/cloudsploit.git
-$ cd cloudsploit
-$ docker build . -t cloudsploit:0.0.1
-$ docker run cloudsploit:0.0.1 -h
-$ docker run -e AWS_ACCESS_KEY_ID=XX -e AWS_SECRET_ACCESS_KEY=YY cloudsploit:0.0.1 --compliance=pci
-```
+  ```
+  Docker
+  ------
+  $ git clone https://github.com/aquasecurity/cloudsploit.git
+  $ cd cloudsploit
+  $ docker build . -t cloudsploit:0.0.1
+  $ docker run cloudsploit:0.0.1 -h
+  $ docker run -e AWS_ACCESS_KEY_ID=XX -e AWS_SECRET_ACCESS_KEY=YY cloudsploit:0.0.1 --compliance=pci
+  ```
 
 - Security Audit Tool n°2 - [SCOUTSUITE](https://github.com/nccgroup/ScoutSuite)  
   - Scout Suite is an open source multi-cloud security-auditing tool, which enables security posture assessment of cloud environments. Using the APIs exposed by cloud providers, Scout Suite gathers configuration data for manual inspection and highlights risk areas. Rather than going through dozens of pages on the web consoles, Scout Suite presents a clear view of the attack surface automatically.
   - Scout Suite was designed by security consultants/auditors. It is meant to provide a point-in-time security-oriented view of the cloud account it was run in. Once the data has been gathered, all usage may be performed offline.
-```
-Install via Git
-----------------
-$ git clone https://github.com/nccgroup/ScoutSuite
-$ cd ScoutSuite
-$ virtualenv -p python3 venv
-$ source venv/bin/activate
-$ pip install -r requirements.txt
-
-Run
----
-$ python scout.py --help
-```
-```
-Install via PIP
-----------------
-$ virtualenv -p python3 venv
-$ source venv/bin/activate
-$ pip install scoutsuite
-$ scout --help
-
-Run
----
-$  python scout.py aws --profile basc -f
-```
+  ```
+  Install via Git
+  ----------------
+  $ git clone https://github.com/nccgroup/ScoutSuite
+  $ cd ScoutSuite
+  $ virtualenv -p python3 venv
+  $ source venv/bin/activate
+  $ pip install -r requirements.txt
+  
+  Run
+  ---
+  $ python scout.py --help
+  ```
+  ```
+  Install via PIP
+  ----------------
+  $ virtualenv -p python3 venv
+  $ source venv/bin/activate
+  $ pip install scoutsuite
+  $ scout --help
+  
+  Run
+  ---
+  $  python scout.py aws --profile basc -f
+  ```
 
 - Security Audit Tool n°3 - [PROWLER](https://github.com/prowler-cloud/prowler)  
   - Prowler is an Open Cloud Security platform trusted by thousands to automate security and compliance in any cloud environment. With hundreds of ready-to-use checks and compliance frameworks, Prowler delivers real-time, customizable monitoring and seamless integrations, making cloud security simple, scalable, and cost-effective for organizations of any size.
-```
-Install Prowler CLI - Pip package (with Python >3.9.1, <3.13)
---------------------------------------------------------------
-$ pip install prowler
-
-Run
----
-$ prowler -v
-```
-```
-Install Prowler CLI from GitHub (Python >3.9.1, <3.13 is required with pip and Poetry)
----------------------------------------------------------------------------------------
-$ git clone https://github.com/prowler-cloud/prowler
-$ cd prowler
-$ eval $(poetry env activate)
-$ poetry install
-
-Run
----
-$ python prowler-cli.py -v
-```
+  ```
+  Install Prowler CLI - Pip package (with Python >3.9.1, <3.13)
+  --------------------------------------------------------------
+  $ pip install prowler
+  
+  Run
+  ---
+  $ prowler -v
+  ```
+  ```
+  Install Prowler CLI from GitHub (Python >3.9.1, <3.13 is required with pip and Poetry)
+  ---------------------------------------------------------------------------------------
+  $ git clone https://github.com/prowler-cloud/prowler
+  $ cd prowler
+  $ eval $(poetry env activate)
+  $ poetry install
+  
+  Run
+  ---
+  $ python prowler-cli.py -v
+  ```
 
 #### B. Check for known privesc attack vectors in AWS
   
