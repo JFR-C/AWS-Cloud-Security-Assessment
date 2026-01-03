@@ -213,63 +213,194 @@ Key Capabilities (from AWS documentation):
 
 #### F. How to log into AWS cloud (Web management console, AwS CLI, EC2 instnaces, ...)
 
+
+- Step 1 - Install the AWS CLI  
+  <i/>The AWS Command Line Interface (CLI) is a tool that lets you interact with AWS services from your terminal.</i>
+  ```
+  Linux:
+  $ sudo apt install awscli
+  $ aws --version
+  or
+  $ sudo yum install awscli
+  $ aws --version
+  
+  MacOS:
+  $ brew install awscli
+  $ aws --version
+
+  Windows:
+  - Download the installer from AWS
+  - Run it and follow the steps
+  Ps C:\> aws --version
+  ```
+
+- Step 2 - Create an IAM User (if not already done)  
+  <i/>You need an IAM user with 'Programmatic accesss' so in the AWS Web console:</i>
+  ```
+  - Go to IAM
+  - Select Users
+  - Click Create user
+  - Enable Access key – Programmatic access
+  - Attach permissions (e.g., AdministratorAccess or a custom policy)
+  - Download the Access Key ID and Secret Access Key (Note: this is the only time AWS shows you the secret key)
+  ```
+  
+- Step 3 - Configure the AWS CLI
+  - Method 1 — Using aws configure (recommended for beginners)
+  ```
+  $ aws configure
+  -> You will be prompted for:
+   AWS Access Key ID: <paste your key>
+   AWS Secret Access Key: <paste your secret>
+   Default region name: eu-west-1 (or your region)
+   Default output format: json
+  
+  -> This creates a config file in:
+  For Linux/macOS: ~/.aws/credentials and ~/.aws/config
+  For Windows: C:\Users\<you>\.aws\credentials
+
+  Where Your Credentials Are Stored
+  ---------------------------------
+  $ ls ~/.aws/credentials
+  
+  [default]
+  aws_access_key_id = AKIA...
+  aws_secret_access_key = abc123...
+  
+  [myprofile]
+  aws_access_key_id = AKIA...
+  aws_secret_access_key = xyz789...
+  ```
+
+  - Method 2 — Using named profiles (Great when you manage multiple AWS accounts)
+ ```
+  $ aws configure --profile myprofile
+  -> You will be prompted for:
+   AWS Access Key ID: <paste your key>
+   AWS Secret Access Key: <paste your secret>
+   Default region name: eu-west-1 (or your region)
+   Default output format: json
+ ```
+
+  - Method 3 — Using environment variables (export)
+  </i> Useful for: Temporary sessions, CI/CD pipelines, avoiding writing credentials to disk. </i>
+  ```
+  $ export AWS_ACCESS_KEY_ID="<your key>"
+  $ export AWS_SECRET_ACCESS_KEY="<your secret>"
+  $ export AWS_DEFAULT_REGION="eu-west-1"
+  $ export AWS_SESSION_TOKEN="<token>"   # only if using temporary credentials
+
+  Note: You can aslo use profiles if you want. In that case run first the command: export AWS_PROFILE="myprofile"
+  ```
+
+- Step 4 - Test Your Connection
+  - Method 1 (Without profile)
+  ```
+  $ aws sts get-caller-identity
+  {
+      "UserId": "EXAMPLE",
+      "Account": "123456789012",
+      "Arn": "arn:aws:iam::123456789012:user/your-user"
+  }
+  ```
+  - Method 2 (with profile)
+  $ aws --profile myprofile sts get-caller-identity
+  {
+      "UserId": "EXAMPLE",
+      "Account": "123456789012",
+      "Arn": "arn:aws:iam::123456789012:user/your-user"
+  }
+  ```
+  
+
+```bash
 # First of all, set your profile
 aws configure --profile test 
 set profile=test # Just for convenience
+
+# ~/.aws/credentials
+[default]
+aws_access_key_id = XXX
+aws_secret_access_key = XXXX
+
+export AWS_ACCESS_KEY_ID=
+export AWS_SECRET_ACCESS_KEY=
+export AWS_DEFAULT_REGION=
+
+# If we can steal AWS credentials, add to your configuration
+aws configure --profile stolen
+# Open ~/.aws/credentials
+# Under the [stolen] section add aws_session_token and add the discovered token value here
+aws sts get-caller-identity --profile stolen
+
+# Check valid
+aws sts get-caller-identity
+aws sdb list-domains --region us-east-1
 
 # SSH into created instance:
 ssh -i ".ssh/key.pem" <user>@<instance-ip>
 sudo mount /dev/xvdb1 /mnt
 cat /mnt/home/ubuntu/setupNginx.sh
+```
 
 #### G. List of usefull AWS CLI commands
  
 | Amazon Web Service | ACTION | COMMAND | 
 | :-----: | :-----: | :-----: | 
 | STS | Get basic account info | aws sts get-caller-identity | 
+| STS | Show the AWS account ID, IAM user/role, and ARN associated with the provided profile. It returns the identity whose credentials are being used, which includes
+IAM user, IAM role, assumed role (including EC2 instance profiles) | aws --profile test sts get-caller-identity | 
+| STS | Request temporary STS session credentials | aws sts get-session-token | 
+| STS | Check which AWS account an access key belongs to | aws sts get-access-key-info --access-key-id=XXXXXXXXX | 
 | IAM | List IAM users | aws iam list-users | 
-| IAM | Display the (custom) account password policy | aws iam get-account-password-policy |
+| IAM | Show the IAM account password policy | aws iam get-account-password-policy |
 | IAM | Create or change the (custom) account password policy | aws iam update-account-password-policy |
 | IAM | List all MFA devices | aws iam list-mfa-devices | 
 | IAM | List all MFA devices for a IAM user | aws iam list-mfa-devices --user-name username | 
 | IAM | Generate a credential report that lists all users in your account and the status of their various credentials, including passwords, access keys, and MFA devices. | aws iam generate-credential-report | 
 | IAM | View the last credential report that was generated | aws iam get-credential-report | 
 | IAM | List access keys for a user | aws iam list-access-keys --user-name username | 
-| IAM | Backdoor account with second set of access keys | aws iam create-access-key --user-name username | 
+| IAM | Creates a brand‑new access key for that IAM user. Note: It does not modify, rotate, or overwrite an existing key (backdoor) | aws iam create-access-key --user-name	username | 
 | IAM | List IAM roles | aws iam list-roles | 
-| IAM | List roles policies | aws --profile "test" iam get-role --role-name "test-role" | 
-| IAM | Export and brute force all roles for assume role escalation | ```bash aws iam list-roles --query 'Roles[].Arn' | jq -r '.[]' >> rolearns.txt while read r; do echo $r; aws sts assume-role --role-arn $r --role-session-name awshax; done < rolearns.txt``` | 
-| IAM | Get policies available | ```bash aws --profile "$profile" iam list-policies | jq -r ".Policies[].Arn"``` | 
-| IAM | Get specific policy version | aws --profile "$profile" iam get-policy --policy-arn "$i" --query "Policy.DefaultVersionId" --output text | 
-| IAM | List Managed User policies | aws --profile "test" iam list-attached-user-policies --user-name "test-user" | 
-| IAM | List Managed Group policies | aws --profile "test" iam list-attached-group-policies --group-name "test-group" | 
-| IAM | List Managed Role policies | aws --profile "test" iam list-attached-role-policies --role-name "test-role" | 
-| IAM | List Inline User policies | aws --profile "test" iam list-user-policies --user-name "test-user" | 
-| IAM | List Inline Group policies | aws --profile "test" iam list-group-policies --group-name "test-group" | 
-| IAM | List Inline Role policies | aws --profile "test" iam list-role-policies --role-name "test-role" | 
-| IAM | Describe Inline User policies | aws --profile "test" iam get-user-policy --user-name "test-user" --policy-name "test-policy" | 
-| IAM | Describe Inline Group policies | aws --profile "test" iam get-group-policy --group-name "test-group" --policy-name "test-policy" | 
-| IAM | Describe Inline Role policies | aws --profile "test" iam get-role-policy --role-name "test-role" --policy-name "test-policy" | 
+| IAM | Retrieve details and metadata about a specific IAM role | aws --profile "test" iam get-role --role-name "test-role" | 
+| IAM | Export and brute force all roles for assume role escalation | aws iam list-roles --query 'Roles[].Arn' \| jq -r '.[]' >> rolearns.txt while read r; do echo $r; aws sts assume-role --role-arn $r --role-session-name awshax; done < rolearns.txt | 
+| IAM | Get policies available | aws --profile "$profile" iam list-policies \| jq -r ".Policies[].Arn" | 
+| IAM | Retrieve the default version ID of a specific IAM managed policy | aws --profile "$profile" iam get-policy --policy-arn "$i" --query "Policy.DefaultVersionId" --output text | 
+| IAM | Retrieve the full JSON document of the default version of a specific IAM managed policy | aws iam get-policy-version --policy-arn provide_policy_arn --version-id $(aws iam get-policy --policy-arn provide_policy_arn --query 'Policy.DefaultVersionId' --output text) | 
+| IAM | Get all juicy info oneliner (search for Action/Resource */*) | profile="test"; for i in $(aws --profile "$profile" iam list-policies \| jq -r '.Policies[].Arn'); do echo "Describing policy $i" && aws --profile "$profile" iam get-policy-version --policy-arn "$i" --version-id $(aws --profile "$profile" iam get-policy --policy-arn "$i" --query 'Policy.DefaultVersionId' --output text); done \| tee /tmp/policies.log | 
+| IAM | List managed policies attached to a user | aws --profile "test" iam list-attached-user-policies --user-name "test-user" | 
+| IAM | List managed policies attached to a group | aws --profile "test" iam list-attached-group-policies --group-name "test-group" | 
+| IAM | List managed policies attached to a role | aws --profile "test" iam list-attached-role-policies --role-name "test-role" | 
+| IAM | List inline IAM policies directly embedded in a specific user | aws --profile "test" iam list-user-policies --user-name "test-user" | 
+| IAM | List inline IAM policies directly embedded in a specific group | aws --profile "test" iam list-group-policies --group-name "test-group" | 
+| IAM | List inline IAM policies directly embedded in a specific role | aws --profile "test" iam list-role-policies --role-name "test-role" | 
+| IAM | Describe inline IAM policies directly embedded in a specific user| aws --profile "test" iam get-user-policy --user-name "test-user" --policy-name "test-policy" | 
+| IAM | Describe inline IAM policies directly embedded in a specific group | aws --profile "test" iam get-group-policy --group-name "test-group" --policy-name "test-policy" | 
+| IAM | Describe inline IAM policies directly embedded in a specific role | aws --profile "test" iam get-role-policy --role-name "test-role" --policy-name "test-policy" | 
 | S3 | List S3 buckets accessible to an account | aws s3 ls | 
-| S3 | List all S3 buckets | aws s3 ls PIPE-SYMBOL awk '{print $3}' >> s3-all-buckets.txt | 
+| S3 | List S3 buckets | aws s3api list-buckets | 
+| S3 | List all S3 buckets | aws s3 ls \| awk '{print $3}' >> s3-all-buckets.txt | 
 | S3 | List the contents of an S3 bucket | aws s3 ls s3://bucketname | 
+| S3 | List the contents of an S3 bucket | aws s3 ls --recursive s3://bucket.com | 
 | S3 | Download contents of a S3 bucket | aws s3 sync s3://bucketname s3-files-dir | 
-| EC2 (VM) | List EC2 instances | aws ec2 describe-instances | 
-| EC2 (VM) | List EC2 snapshots | aws ec2 describe-snapshots | 
-| EC2 (VM) | List EC2 snapshots | aws ec2 describe-snapshots --owner-ids {user-id} | 
-| EC2 (VM)| Export all EC2 Instance User Data | while read r; do for instance in $(aws ec2 describe-instances --query 'Reservations[].Instances[].InstanceId' --region $r PIPE-SYMBOL jq -r '.[]'); do aws ec2 describe-instance-attribute --region $r --instance-id $instance --attribute userData >> ec2-instance-userdata.txt; done; done < regions.txt | 
-| EC2 (VM) | List EC2 subnets | aws ec2 describe-subnets | 
-| EC2 (VM) | List EC2 network interfaces | aws ec2 describe-network-interfaces | 
-| EC2 (VM) | List EC2 security groups | aws ec2 describe-security-groups | 
-| EC2 (VM) | List EC2 security groups | aws ec2 describe-security-groups --filters Name=ip-permission.cidr,Values='0.0.0.0/0' --query "SecurityGroups[*].[GroupName]" --output text | 
-| EC2 (VM) | List EC2 security groups | aws ec2 describe-security-groups --group-ids <VPC Security Group ID> --region <region> | 
+| S3 | Copy contents of a S3 bucket | aws s3 cp s3://bucket-name/<file> <destination> | 
+| S3 | Upload contents to a S3 bucket | aws s3 cp/mv test-file.txt s3://bucket-name | 
+| S3 | Delete contents of a S3 bucket | aws s3 rm s3://bucket-name/test-file.txt | 
+| EC2 (VM) | List all EC2 instances and their details in the current region | aws ec2 describe-instances | 
+| EC2 (VM) | List all EC2 (EBS) snapshots visible to your account (owned or shared) | aws ec2 describe-snapshots | 
+| EC2 (VM) | List all EC2 (EBS) snapshots owned by a specific AWS account | aws ec2 describe-snapshots --owner-ids {user-id} | 
+| EC2 (VM)| Export all EC2 Instance User Data | while read r; do for instance in $(aws ec2 describe-instances --query 'Reservations[].Instances[].InstanceId' --region $r \| jq -r '.[]'); do aws ec2 describe-instance-attribute --region $r --instance-id $instance --attribute userData >> ec2-instance-userdata.txt; done; done < regions.txt | 
+| EC2 (VM) | List all EC2 (VPC) subnets and their details in the current region | aws ec2 describe-subnets | 
+| EC2 (VM) | List all EC2 Elastic Network Interfaces (ENIs) and their details in the current region | aws ec2 describe-network-interfaces | 
+| EC2 (VM) | List all EC2 (VPC) security groups and their configuration details in the current region | aws ec2 describe-security-groups | 
+| EC2 (VM) | List security groups that allow inbound access from anywhere (0.0.0.0/0) | aws ec2 describe-security-groups --filters Name=ip-permission.cidr,Values='0.0.0.0/0' --query "SecurityGroups[*].[GroupName]" --output text | 
+| EC2 (VM) | Retrieve details for the specific security group identified by its Group ID in the specified region | aws ec2 describe-security-groups --group-ids <VPC Security Group ID> --region <region> | 
 | EC2 (VM) | Instance Metadata Service URL | http://169.254.169.254/latest/meta-data | 
 | EC2 (VM) | Additional IAM creds possibly available here | http://169.254.169.254/latest/meta-data/iam/security-credentials/IAM-Role-Name | 
 | DirectConnect (VPN) | List DirectConnect (VPN) connections | aws directconnect describe-connections | 
 | RDS | List all RDS Snapshots | aws rds describe-db-snapshots --region us-east-1 --snapshot-type manual --query=DBSnapshots[*].DBSnapshotIdentifier | 
-| Lambda (Serverless) | List Lambda functions | aws lambda list-functions --region region | 
+| Lambda (Serverless) | List all Lambda functions in the specified region, including their configuration details (up to 50 per call) | aws lambda list-functions --region region | 
 | Lambda (Serverless) | Look at environment variables set for secrets and analyze code | aws lambda get-function --function-name lambda-function-name | 
-| Lambda (Serverless) | List Lambda functions | aws lambda list-functions --region region | 
 | Kubernetes (EKS) | List EKS clusters | aws eks list-clusters --region region | 
 | Kubernetes (EKS) | Update kubeconfig | aws eks update-kubeconfig --name cluster-name --region region | 
 
