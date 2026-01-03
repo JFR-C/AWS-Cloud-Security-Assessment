@@ -2,31 +2,33 @@
 Audit & pentest methodology, technical notes, list of tools, scripts and commands that are useful for assessing the security posture of an AWS Cloud environment.<br>
 
 ### Table of contents 
-- I. AWS Cloud Essentials  
-  - A. Introduction
-  - B. Main AWS services across IaaS, PaaS, and SaaS
-  - C. AWS Security Best Practices
-  - D. IAM Users vs. IAM Roles — Key Differences
-  - E. Cloud‑Native Application Protection Platforms (CNAPP)
-  - F. How to use the AWS CLI to log into AWS cloud
-  - G. List of usefull AWS CLI commands
+- I. AWS Cloud Essentials - Reminder
+  - 1.1. Introduction
+  - 1.2. Main AWS services across IaaS, PaaS, and SaaS
+  - 1.3. AWS Security Best Practices
+  - 1.4. IAM Users vs. IAM Roles — Key Differences
+  - 1.5. Cloud‑Native Application Protection Platforms (CNAPP)
+  - 1.6. How to use the AWS CLI
+  - 1.7. List of usefull AWS CLI commands
+  - 1.8. Basic tutorial to create a Kali Linux EC2 VM on AWS
 
 - II. AWS Security Audit
-  - A. Run AWS security scans with audit tools to identify security misconfiguration
+  - 2.1. Run AWS security scans with audit tools to identify security misconfiguration
     - CloudSuite
     - Prowler
     - CloudSploit
-  - B. Check for known privesc attack vectors in AWS
+  - 2.2. Check for known privesc attack vectors in AWS
 
 - III. AWS Penetration Testing
-  - A. Black-box penetration test (we start with no account)
-  - B. Grey-box penetration test (we start with 1 low-privileged Windows account)
+  - 3.1. AWS Pentest scope and rules of engagement
+  - 3.2. Black-box penetration test (we start with no account)
+  - 3.3. Grey-box penetration test (we start with 1 low-privileged Windows account)
 
 ----------------
 
 ### I. AWS Cloud Essentials 
 
-#### A. Introduction
+#### 1.1. Introduction
 
 - AWS provides cloud computing i.e. on-demand delivery of technology services through the Internet with pay-as-you-go pricing.
 The AWS Cloud encompasses a broad set of global cloud-based products that includes compute, storage, databases, analytics, networking, mobile, developer tools, management tools, IoT, security, and enterprise applications: on-demand, available in seconds, with pay-as-you-go pricing.
@@ -34,7 +36,7 @@ The AWS Cloud encompasses a broad set of global cloud-based products that includ
 - AWS delivers cloud capabilities through the three service models: Software as a Service (SaaS), Platform as a Service (PaaS), and Infrastructure as a Service (IaaS). 
 These models differ in how much control the customer retains versus how much AWS manages. Understanding these layers helps teams choose the right level of abstraction for their applications, operations, and security responsibilities.
 
-#### B. Main AWS services across IaaS, PaaS, and SaaS
+#### 1.2. Main AWS services across IaaS, PaaS, and SaaS
 
 - AWS Cloud - Infrastructure as a Service (IaaS) - These services give raw compute, storage, and networking building blocks.
   - Amazon EC2 — Provides resizable virtual servers in the cloud with full OS‑level control.
@@ -75,7 +77,7 @@ These models differ in how much control the customer retains versus how much AWS
   - ...
 
 
-#### C. AWS Security Best Practices
+#### 1.3. AWS Security Best Practices
 
 - Identity & Access Management
   - 1. Secure your AWS account.
@@ -147,7 +149,7 @@ Balancer access logging, to gain visibility into events. Configure logs to flow 
   - 3. Practice responding to events.
     - Simulate and practice incident response by running regular game days, incorporating the lessons learned into your incident management plans, and continuously improving them.
 
-#### D. IAM Users vs. IAM Roles — Key Differences
+#### 1.4. IAM Users vs. IAM Roles — Key Differences
   - Credential Type
     - IAM Users: Have long‑lived credentials — passwords and access keys that persist until manually rotated.
     - IAM Roles: Provide temporary credentials issued by STS that automatically expire, reducing risk if compromised.
@@ -168,7 +170,7 @@ Balancer access logging, to gain visibility into events. Configure logs to flow 
     - IAM Roles: Actions are logged under the role, but CloudTrail shows who assumed the role, improving accountability.
 
 
-#### E. Cloud‑Native Application Protection Platforms (CNAPP)
+#### 1.5. Cloud‑Native Application Protection Platforms (CNAPP)
 
 - Effective CNAPP solutions must consolidate capabilities rather than rebrand existing traditional security tools:
   - Cloud Security Posture Management (CSPM) - Continuous misconfiguration detection and security posture monitoring
@@ -212,7 +214,7 @@ Key Capabilities (from AWS documentation):
     - It is a cloud security suite that focuses heavily on workload protection, runtime threat detection, and behavioral analytics. It integrates with the broader Falcon platform, providing unified endpoint and cloud threat intelligence.
 
 
-#### F. How to use the AWS CLI to log into AWS cloud 
+#### 1.6. How to use the AWS CLI
 
 - Step 1 - Install the AWS CLI  
   <i/>The AWS Command Line Interface (CLI) is a tool that lets you interact with AWS services from your terminal.</i>
@@ -344,7 +346,7 @@ sudo mount /dev/xvdb1 /mnt
 cat /mnt/home/ubuntu/setupNginx.sh
 ```
 
-#### G. List of usefull AWS CLI commands
+#### 1.7. List of usefull AWS CLI commands
  
 | Amazon Web Service | ACTION | COMMAND | 
 | :-----: | :-----: | :-----: | 
@@ -394,7 +396,7 @@ cat /mnt/home/ubuntu/setupNginx.sh
 | EC2 (VM) | List all EC2 Elastic Network Interfaces (ENIs) and their details in the current region | aws ec2 describe-network-interfaces | 
 | EC2 (VM) | List all EC2 (VPC) security groups and their configuration details in the current region | aws ec2 describe-security-groups | 
 | EC2 (VM) | List security groups that allow inbound access from anywhere (0.0.0.0/0) | aws ec2 describe-security-groups --filters Name=ip-permission.cidr,Values='0.0.0.0/0' --query "SecurityGroups[*].[GroupName]" --output text | 
-| EC2 (VM) | Retrieve details for the specific security group identified by its Group ID in the specified region | aws ec2 describe-security-groups --group-ids <VPC Security Group ID> --region <region> | 
+| EC2 (VM) | Retrieve details for the specific security group identified by its Group ID in the specified region | aws ec2 describe-security-groups --group-ids VPC-Security-Group-ID --region region | 
 | EC2 (VM) | Instance Metadata Service URL | http://169.254.169.254/latest/meta-data | 
 | EC2 (VM) | Additional IAM creds possibly available here | http://169.254.169.254/latest/meta-data/iam/security-credentials/IAM-Role-Name | 
 | DirectConnect (VPN) | List DirectConnect (VPN) connections | aws directconnect describe-connections | 
@@ -404,6 +406,24 @@ cat /mnt/home/ubuntu/setupNginx.sh
 | Kubernetes (EKS) | List EKS clusters | aws eks list-clusters --region region | 
 | Kubernetes (EKS) | Update kubeconfig | aws eks update-kubeconfig --name cluster-name --region region | 
 
+
+#### 1.8. Basic tutorial to create a Kali Linux EC2 VM on AWS
+
+- Step 1 - Log in to the AWS Console and go to EC2 → Instances → Launch Instance.
+- Step 3 - Name your instance (e.g., Kali-Linux-VM).
+- Step 4 - Under Application and OS Images (AMI), click Browse more AMIs, search for “Kali Linux”, and select the official Kali AMI from AWS Marketplace.
+- Step 5 - When prompted, accept the subscription (Kali AMIs are free, you only pay for compute).
+- Step 6 - Under Instance type, choose the option/config you want. Below are the cheapest options:
+  - t2.small (Specs: 1 vCPU, 2 GiB RAM, Burstable CPU)
+  - t3.micro (Specs: 2 vCPUs, 1 GiB RAM, Better performance than t2.micro)
+  - t2.micro (Specs: 1 vCPU, 1 GiB RAM, Burstable CPU, Free‑tier eligible)
+- Step 7 - Under Key pair, create a new SSH key pair or select an existing one.
+- Step 8 - Under Network settings, allow SSH (port 22) from your public IP only (recommended for security).
+- Step 9 - Keep storage at the default (usually 8–10 GB gp2), which is the cheapest option.
+- Step 10 - Click Launch Instance, wait for it to start, then connect via SSH:
+  ```
+  ssh -i yourkey.pem ec2-user@<public-ip>
+  ```
 
 ----------------
 
