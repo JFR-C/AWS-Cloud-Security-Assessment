@@ -364,6 +364,7 @@ cat /mnt/home/ubuntu/setupNginx.sh
 | IAM | List access keys for a user | aws iam list-access-keys --user-name username | 
 | IAM | Creates a brand‑new access key for that IAM user. Note: It does not modify, rotate, or overwrite an existing key (backdoor) | aws iam create-access-key --user-name	username | 
 | IAM | List IAM roles | aws iam list-roles | 
+| IAM | List IAM groups | aws iam list-groups | 
 | IAM | Retrieve details and metadata about a specific IAM role | aws --profile "test" iam get-role --role-name "test-role" | 
 | IAM | Export and brute force all roles for assume role escalation | aws iam list-roles --query 'Roles[].Arn' \| jq -r '.[]' >> rolearns.txt while read r; do echo $r; aws sts assume-role --role-arn $r --role-session-name awshax; done < rolearns.txt | 
 | IAM | Get policies available | aws --profile "$profile" iam list-policies \| jq -r ".Policies[].Arn" | 
@@ -559,8 +560,6 @@ cat /mnt/home/ubuntu/setupNginx.sh
   - For Lambda, just having the permission to modify functions can lead to privilege escalation because a user can update a Lambda function to perform privileged actions on their behalf. The risk here depends on the permissions with which the Lambda function operates.
   - Similarly, the permission to modify a Glue development endpoint can lead to privilege escalation because a user might, for example, change the SSH key associated with an endpoint so they can then log into the system and use it to perform privileged actions. Again, the risk depends on the permissions assigned to the endpoint.
    
-
-
 
 ----------------
 
