@@ -8,7 +8,8 @@ Audit & pentest methodology, technical notes, list of tools, scripts and command
   - C. AWS Security Best Practices
   - D. IAM Users vs. IAM Roles — Key Differences
   - E. Cloud‑Native Application Protection Platforms (CNAPP)
-  - F. List of usefull AWS CLI commands
+  - F. How to use the AWS CLI to log into AWS cloud
+  - G. List of usefull AWS CLI commands
 
 - II. AWS Security Audit
   - A. Run AWS security scans with audit tools to identify security misconfiguration
@@ -211,8 +212,7 @@ Key Capabilities (from AWS documentation):
     - It is a cloud security suite that focuses heavily on workload protection, runtime threat detection, and behavioral analytics. It integrates with the broader Falcon platform, providing unified endpoint and cloud threat intelligence.
 
 
-#### F. How to log into AWS cloud (Web management console, AwS CLI, EC2 instnaces, ...)
-
+#### F. How to use the AWS CLI to log into AWS cloud 
 
 - Step 1 - Install the AWS CLI  
   <i/>The AWS Command Line Interface (CLI) is a tool that lets you interact with AWS services from your terminal.</i>
@@ -273,28 +273,28 @@ Key Capabilities (from AWS documentation):
   ```
 
   - Method 2 — Using named profiles (Great when you manage multiple AWS accounts)
- ```
+  ```
   $ aws configure --profile myprofile
-  -> You will be prompted for:
-   AWS Access Key ID: <paste your key>
-   AWS Secret Access Key: <paste your secret>
-   Default region name: eu-west-1 (or your region)
-   Default output format: json
- ```
+    -> You will be prompted for:
+     AWS Access Key ID: <paste your key>
+     AWS Secret Access Key: <paste your secret>
+     Default region name: eu-west-1 (or your region)
+     Default output format: json
+  ```
 
   - Method 3 — Using environment variables (export)
-  </i> Useful for: Temporary sessions, CI/CD pipelines, avoiding writing credentials to disk. </i>
+    </i> Useful for: Temporary sessions, CI/CD pipelines, avoiding writing credentials to disk. </i>
   ```
   $ export AWS_ACCESS_KEY_ID="<your key>"
   $ export AWS_SECRET_ACCESS_KEY="<your secret>"
   $ export AWS_DEFAULT_REGION="eu-west-1"
   $ export AWS_SESSION_TOKEN="<token>"   # only if using temporary credentials
-
+  
   Note: You can aslo use profiles if you want. In that case run first the command: export AWS_PROFILE="myprofile"
   ```
 
 - Step 4 - Test Your Connection
-  - Method 1 (Without profile)
+  - Method 1 (without profile)
   ```
   $ aws sts get-caller-identity
   {
@@ -304,6 +304,7 @@ Key Capabilities (from AWS documentation):
   }
   ```
   - Method 2 (with profile)
+  ```
   $ aws --profile myprofile sts get-caller-identity
   {
       "UserId": "EXAMPLE",
