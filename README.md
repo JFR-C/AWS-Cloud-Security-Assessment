@@ -5,7 +5,7 @@ Audit & pentest methodology, technical notes, list of tools, scripts and command
 - I. AWS Cloud Essentials  
   - A. Introduction
   - B. Main AWS services across IaaS, PaaS, and SaaS
-  - D. AWS Security Best Practices
+  - C. AWS Security Best Practices
   - D. IAM Users vs. IAM Roles — Key Differences
   - E. Cloud‑Native Application Protection Platforms (CNAPP)
   - F. List of usefull AWS CLI commands
@@ -210,7 +210,19 @@ Key Capabilities (from AWS documentation):
   - CrowdStrike Falcon Cloud Security
     - It is a cloud security suite that focuses heavily on workload protection, runtime threat detection, and behavioral analytics. It integrates with the broader Falcon platform, providing unified endpoint and cloud threat intelligence.
 
-#### F. List of usefull AWS CLI commands
+
+#### F. How to log into AWS cloud (Web management console, AwS CLI, EC2 instnaces, ...)
+
+# First of all, set your profile
+aws configure --profile test 
+set profile=test # Just for convenience
+
+# SSH into created instance:
+ssh -i ".ssh/key.pem" <user>@<instance-ip>
+sudo mount /dev/xvdb1 /mnt
+cat /mnt/home/ubuntu/setupNginx.sh
+
+#### G. List of usefull AWS CLI commands
  
 | Amazon Web Service | ACTION | COMMAND | 
 | :-----: | :-----: | :-----: | 
@@ -225,15 +237,32 @@ Key Capabilities (from AWS documentation):
 | IAM | List access keys for a user | aws iam list-access-keys --user-name username | 
 | IAM | Backdoor account with second set of access keys | aws iam create-access-key --user-name username | 
 | IAM | List IAM roles | aws iam list-roles | 
-| IAM | Export and brute force all roles for assume role escalation | aws iam list-roles --query 'Roles[].Arn' PIPE-SYMBOL jq -r '.[]' >> rolearns.txt while read r; do echo $r; aws sts assume-role --role-arn $r --role-session-name awshax; done < rolearns.txt | 
+| IAM | List roles policies | aws --profile "test" iam get-role --role-name "test-role" | 
+| IAM | Export and brute force all roles for assume role escalation | ```bash aws iam list-roles --query 'Roles[].Arn' | jq -r '.[]' >> rolearns.txt while read r; do echo $r; aws sts assume-role --role-arn $r --role-session-name awshax; done < rolearns.txt``` | 
+| IAM | Get policies available | ```bash aws --profile "$profile" iam list-policies | jq -r ".Policies[].Arn"``` | 
+| IAM | Get specific policy version | aws --profile "$profile" iam get-policy --policy-arn "$i" --query "Policy.DefaultVersionId" --output text | 
+| IAM | List Managed User policies | aws --profile "test" iam list-attached-user-policies --user-name "test-user" | 
+| IAM | List Managed Group policies | aws --profile "test" iam list-attached-group-policies --group-name "test-group" | 
+| IAM | List Managed Role policies | aws --profile "test" iam list-attached-role-policies --role-name "test-role" | 
+| IAM | List Inline User policies | aws --profile "test" iam list-user-policies --user-name "test-user" | 
+| IAM | List Inline Group policies | aws --profile "test" iam list-group-policies --group-name "test-group" | 
+| IAM | List Inline Role policies | aws --profile "test" iam list-role-policies --role-name "test-role" | 
+| IAM | Describe Inline User policies | aws --profile "test" iam get-user-policy --user-name "test-user" --policy-name "test-policy" | 
+| IAM | Describe Inline Group policies | aws --profile "test" iam get-group-policy --group-name "test-group" --policy-name "test-policy" | 
+| IAM | Describe Inline Role policies | aws --profile "test" iam get-role-policy --role-name "test-role" --policy-name "test-policy" | 
 | S3 | List S3 buckets accessible to an account | aws s3 ls | 
 | S3 | List all S3 buckets | aws s3 ls PIPE-SYMBOL awk '{print $3}' >> s3-all-buckets.txt | 
 | S3 | List the contents of an S3 bucket | aws s3 ls s3://bucketname | 
 | S3 | Download contents of a S3 bucket | aws s3 sync s3://bucketname s3-files-dir | 
 | EC2 (VM) | List EC2 instances | aws ec2 describe-instances | 
+| EC2 (VM) | List EC2 snapshots | aws ec2 describe-snapshots | 
+| EC2 (VM) | List EC2 snapshots | aws ec2 describe-snapshots --owner-ids {user-id} | 
 | EC2 (VM)| Export all EC2 Instance User Data | while read r; do for instance in $(aws ec2 describe-instances --query 'Reservations[].Instances[].InstanceId' --region $r PIPE-SYMBOL jq -r '.[]'); do aws ec2 describe-instance-attribute --region $r --instance-id $instance --attribute userData >> ec2-instance-userdata.txt; done; done < regions.txt | 
 | EC2 (VM) | List EC2 subnets | aws ec2 describe-subnets | 
 | EC2 (VM) | List EC2 network interfaces | aws ec2 describe-network-interfaces | 
+| EC2 (VM) | List EC2 security groups | aws ec2 describe-security-groups | 
+| EC2 (VM) | List EC2 security groups | aws ec2 describe-security-groups --filters Name=ip-permission.cidr,Values='0.0.0.0/0' --query "SecurityGroups[*].[GroupName]" --output text | 
+| EC2 (VM) | List EC2 security groups | aws ec2 describe-security-groups --group-ids <VPC Security Group ID> --region <region> | 
 | EC2 (VM) | Instance Metadata Service URL | http://169.254.169.254/latest/meta-data | 
 | EC2 (VM) | Additional IAM creds possibly available here | http://169.254.169.254/latest/meta-data/iam/security-credentials/IAM-Role-Name | 
 | DirectConnect (VPN) | List DirectConnect (VPN) connections | aws directconnect describe-connections | 
@@ -243,6 +272,7 @@ Key Capabilities (from AWS documentation):
 | Lambda (Serverless) | List Lambda functions | aws lambda list-functions --region region | 
 | Kubernetes (EKS) | List EKS clusters | aws eks list-clusters --region region | 
 | Kubernetes (EKS) | Update kubeconfig | aws eks update-kubeconfig --name cluster-name --region region | 
+
 
 ----------------
 
