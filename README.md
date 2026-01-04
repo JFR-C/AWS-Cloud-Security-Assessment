@@ -354,6 +354,9 @@ cat /mnt/home/ubuntu/setupNginx.sh
 | STS | Show the AWS account ID, IAM user/role, and ARN associated with the provided profile. It returns the identity whose credentials are being used, which includes IAM user, IAM role, assumed role (including EC2 instance profiles) | aws --profile test sts get-caller-identity | 
 | STS | Request temporary STS session credentials | aws sts get-session-token | 
 | STS | Check which AWS account an access key belongs to | aws sts get-access-key-info --access-key-id=XXXXXXXXX | 
+| STS | How to assume a role (basic example) | aws sts assume-role --role-arn arn:aws:iam::123456789012:role/MyTargetRole --role-session-name MySession | 
+| STS | How to assume a role (example using a profile) | aws --profile mysourceprofile sts assume-role --role-arn arn:aws:iam::123456789012:role/MyTargetRole --role-session-name MySession | 
+| STS | How to assume a role (example with MFA) | aws sts assume-role --role-arn arn:aws:iam::123456789012:role/MyTargetRole --role-session-name MySession --serial-number arn:aws:iam::111122223333:mfa/myuser --token-code 123456 | 
 | IAM | List IAM users | aws iam list-users | 
 | IAM | Show the IAM account password policy | aws iam get-account-password-policy |
 | IAM | Create or change the (custom) account password policy | aws iam update-account-password-policy |
