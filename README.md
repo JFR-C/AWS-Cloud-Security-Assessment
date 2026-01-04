@@ -455,7 +455,7 @@ Key Capabilities (from AWS documentation):
 
 #### 2.1. RUN AWS SECURITY SCANS USING AUDIT TOOLS TO IDENTIFY POTENTIAL SECURITY MISCONFIGURATIONS
 
-- Using an AWS account run tools and scripts that will extract and analyse the AWS environment looking for potential security misconfiguration, and other security issues in key services such as IAM, EC2, Lambda and S3.
+- Use audit tools and scripts to evaluate the security posture of an AWS cloud environment and identify potential misconfigurations across key services such as IAM, EC2, S3, Lambda, VPC, CloudTrail, etc.
 - Minimum Roles & Privileges for AWS Security Audit Tools (General Guidance)
   ```
   - All major audit tools recommend using a read‑only IAM role that the tool assumes. This role typically includes:
