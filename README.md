@@ -4,20 +4,20 @@ Technical notes, audit & pentest methodology, list of tools, scripts and command
 ### Table of contents 
 - I. AWS Cloud Essentials - Reminder
   - [1.1. Introduction](#11-Introduction)
-  - [1.2. Main AWS services across IaaS, PaaS, and SaaS](#12-Main-AW-services-across-IaaS-PaaS-and-SaaS)
+  - [1.2. Main AWS services across IaaS, PaaS, and SaaS](#12-main-aws-services-across-iaas-paas-and-saas)
   - [1.3. AWS Security Best Practices](#13-AWS-Security-Best-Practices)
   - [1.4. Key Differences Between IAM User, Role, and Group](#14-Key-Differences-Between-IAM-User-Role-and-Group)
-  - [1.5. Cloud‑Native Application Protection Platforms (CNAPP)](#15-Cloud‑Native-Application-Protection-Platforms-CNAPP-)
-  - [1.6. Introduction](#16-How-to-use-the-AWS-CLI)
+  - [1.5. Cloud‑Native Application Protection Platforms (CNAPP)](#15-cloudnative-application-protection-platforms-cnapp)
+  - [1.6. How to use the AWS CLI](#16-How-to-use-the-AWS-CLI)
   - [1.7. List of usefull AWS CLI commands](#17-List-of-usefull-AWS-CLI-commands)
   - [1.8. Basic tutorial to create a Kali Linux EC2 VM on AWS](#18-Basic-tutorial-to-create-a-Kali-Linux-EC2-VM-on-AWS)
 
 - II. AWS Security Audit
-  - [2.1. Run AWS security scans with audit tools to identify potential security misconfiguration](#21-Run-AWS-security-scans-with-audit-tools-to-identify-potential-security-misconfiguration)
+  - [2.1. Run AWS security scans with audit tools to identify potential security misconfiguration](#21-run-aws-security-scans-with-audit-tools-to-identify-security-misconfiguration)
     - CloudSuite
     - Prowler
     - CloudSploit
-  - [2.2. Check for known privesc attack vectors in AWS (mostly IAM service)](#22-Check-for-known-privesc-attack-vectors-in-AWS--mostly-IAM-service)
+  - [2.2. Check for known privesc attack vectors in AWS (mostly IAM service)](#22-check-for-known-privesc-attack-vectors-in-aws-mostly-iam)
 
 - III. AWS Penetration Testing
   - 3.1. AWS Pentest scope and rules of engagement
@@ -230,7 +230,7 @@ Key Capabilities (from AWS documentation):
     - It is a cloud security suite that focuses heavily on workload protection, runtime threat detection, and behavioral analytics. It integrates with the broader Falcon platform, providing unified endpoint and cloud threat intelligence.
 
 
-#### 1.6. HOW TO USE TH AWS CLI
+#### 1.6. HOW TO USE THE AWS CLI
 
 - Step 1 - Install the AWS CLI  
   <i/>The AWS Command Line Interface (CLI) is a tool that lets you interact with AWS services from your terminal.</i>
@@ -400,7 +400,7 @@ Key Capabilities (from AWS documentation):
 | Kubernetes (EKS) | Update kubeconfig | aws eks update-kubeconfig --name cluster-name --region region | 
 
 
-#### 1.8. Basic tutorial to create a Kali Linux EC2 VM on AWS
+#### 1.8. BASIC TUTORIAL TO CREATE A KALI LINUX EC2 VM ON AWS
 
 - Step 1 - Log in to the AWS Console and go to EC2 → Instances → Launch Instance.
 - Step 3 - Name your instance (e.g., Kali-Linux-VM).
@@ -987,7 +987,7 @@ Key Capabilities (from AWS documentation):
   $ docker run --rm -e AWS_ACCESS_KEY_ID=XXXXX -e AWS_SECRET_ACCESS_KEY=YYYYYYY cloudsploit:0.0.1 --cloud aws 
   ```
   
-#### 2. Check for known privesc attack vectors in AWS (mostly IAM)
+#### 2.2. Check for known privesc attack vectors in AWS (mostly IAM)
   
 - Usefull ressources:
   - https://github.com/RhinoSecurityLabs/AWS-IAM-Privilege-Escalation
