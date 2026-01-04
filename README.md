@@ -358,6 +358,7 @@ cat /mnt/home/ubuntu/setupNginx.sh
 | STS | How to assume a role (example using a profile) | aws --profile mysourceprofile sts assume-role --role-arn arn:aws:iam::123456789012:role/MyTargetRole --role-session-name MySession | 
 | STS | How to assume a role (example with MFA) | aws sts assume-role --role-arn arn:aws:iam::123456789012:role/MyTargetRole --role-session-name MySession --serial-number arn:aws:iam::111122223333:mfa/myuser --token-code 123456 | 
 | IAM | List IAM users | aws iam list-users | 
+| IAM | Create a new IAM user | aws iam create-user --user-name username | 
 | IAM | Show the IAM account password policy | aws iam get-account-password-policy |
 | IAM | Create or change the (custom) account password policy | aws iam update-account-password-policy |
 | IAM | List all MFA devices | aws iam list-mfa-devices | 
@@ -366,6 +367,8 @@ cat /mnt/home/ubuntu/setupNginx.sh
 | IAM | View the last credential report that was generated | aws iam get-credential-report | 
 | IAM | List access keys for a user | aws iam list-access-keys --user-name username | 
 | IAM | Creates a brand‑new access key for that IAM user. Note: It does not modify, rotate, or overwrite an existing key (backdoor) | aws iam create-access-key --user-name	username | 
+| IAM | Deactivate existing access keys for a IAM user | aws iam update-access-key --user-name <username> --access-key-id XXXXXXXX --status Inactive | 
+| IAM | Delete existing access keys for a IAM user | aws iam delete-access-key --user-name <username> --access-key-id XXXXXXXX | 
 | IAM | List IAM roles | aws iam list-roles | 
 | IAM | List IAM groups | aws iam list-groups | 
 | IAM | Retrieve details and metadata about a specific IAM role | aws --profile "test" iam get-role --role-name "test-role" | 
