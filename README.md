@@ -5,12 +5,13 @@ Technical notes, audit & pentest methodology, list of tools, scripts and command
 - I. AWS Cloud Essentials - Reminder
   - [1.1. Introduction](#11-INTRODUCTION)
   - [1.2. Main AWS services across IaaS, PaaS, and SaaS](#12-main-aws-services-across-iaas-paas-and-saas)
-  - [1.3. AWS Security Best Practices](#13-AWS-Security-Best-Practices)
-  - [1.4. Key Differences Between IAM User, Role, and Group](#14-Key-Differences-Between-IAM-User-Role-and-Group)
+  - [1.3. AWS security best practices](#13-AWS-Security-Best-Practices)
+  - [1.4. Key differences between IAM User, Role, and Group](#14-Key-Differences-Between-IAM-User-Role-and-Group)
   - [1.5. Cloud‑Native Application Protection Platforms (CNAPP)](#15-cloudnative-application-protection-platforms-cnapp)
   - [1.6. How to use the AWS CLI](#16-How-to-use-the-AWS-CLI)
   - [1.7. List of usefull AWS CLI commands](#17-List-of-usefull-AWS-CLI-commands)
-  - [1.8. Basic tutorial to create a Kali Linux EC2 VM on AWS](#18-Basic-tutorial-to-create-a-Kali-Linux-EC2-VM-on-AWS)
+  - [1.8. List of AWS URL services](#18-LIST-OF-AWS-URL-Services)
+  - [1.9. Basic tutorial to create a Kali Linux EC2 VM on AWS](#19-Basic-tutorial-to-create-a-Kali-Linux-EC2-VM-on-AWS)
 
 - II. AWS Security Audit
   - [2.1. Run AWS security scans using audit tools to identify potential misconfigurations](#21-run-aws-security-scans-using-audit-tools-to-identify-potential-security-misconfigurations)
@@ -21,9 +22,9 @@ Technical notes, audit & pentest methodology, list of tools, scripts and command
   - [2.2. Check for known privesc attack vectors in AWS (mostly IAM service)](#22-check-for-known-privesc-attack-vectors-in-aws)
 
 - III. AWS Penetration Testing
-  - 3.1. AWS Pentest scope and rules of engagement
-  - 3.2. Black-box penetration test (we start with no account)
-  - 3.3. Grey-box penetration test (we start with 1 low-privileged Windows account)
+  - [3.1. AWS customer support and service policy for penetration testing](#31-aws-customer-support-and-service-policy-for-penetration-testing)
+  - [3.2. AWS pentest methodology - Usefull ressources](#32-aws-pentest-methodology---usefull-ressources)
+  - [3.1. List of AWS penetration testing tools](#33-list-of-aws-pentest-tools)
 
 ----------------
 
@@ -332,9 +333,9 @@ Key Capabilities (from AWS documentation):
     }
     ```
   
-
+  
 #### 1.7. LIST OF USEFULL AWS CLI COMMANDS
- 
+   
 | Amazon Web Service | ACTION | COMMAND | 
 | :-----: | :-----: | :-----: | 
 | STS | Get basic account info | aws sts get-caller-identity | 
@@ -402,7 +403,36 @@ Key Capabilities (from AWS documentation):
 | Kubernetes (EKS) | Update kubeconfig | aws eks update-kubeconfig --name cluster-name --region region | 
 
 
-#### 1.8. BASIC TUTORIAL TO CREATE A KALI LINUX EC2 VM ON AWS
+#### 1.8. LIST OF AWS URL Services
+
+| Service      | URL                   |
+|--------------|-----------------------|
+| s3           | `https://{user_provided}.s3.amazonaws.com` |
+| cloudfront   | `https://{random_id}.cloudfront.net` |
+| ec2          | `https://ec2-{ip-seperated}.compute-1.amazonaws.com` |
+| es           | `https://{user_provided}-{random_id}.{region}.es.amazonaws.com` |
+| elb          | `http://{user_provided}-{random_id}.{region}.elb.amazonaws.com:80/443` |
+| elbv2        | `https://{user_provided}-{random_id}.{region}.elb.amazonaws.com` |
+| rds          | `mysql://{user_provided}.{random_id}.{region}.rds.amazonaws.com:3306` |
+| rds          | `postgres://{user_provided}.{random_id}.{region}.rds.amazonaws.com:5432` |
+| route 53     | `{user_provided}` |
+| execute-api  | `https://{random_id}.execute-api.{region}.amazonaws.com/{user_provided}` |
+| cloudsearch  | `https://doc-{user_provided}-{random_id}.{region}.cloudsearch.amazonaws.com` |
+| transfer     | `sftp://s-{random_id}.server.transfer.{region}.amazonaws.com` |
+| iot          | `mqtt://{random_id}.iot.{region}.amazonaws.com:8883` |
+| iot          | `https://{random_id}.iot.{region}.amazonaws.com:8443` |
+| iot          | `https://{random_id}.iot.{region}.amazonaws.com:443` |
+| mq           | `https://b-{random_id}-{1,2}.mq.{region}.amazonaws.com:8162` |
+| mq           | `ssl://b-{random_id}-{1,2}.mq.{region}.amazonaws.com:61617` |
+| kafka        | `b-{1,2,3,4}.{user_provided}.{random_id}.c{1,2}.kafka.{region}.amazonaws.com` |
+| kafka        | `{user_provided}.{random_id}.c{1,2}.kafka.useast-1.amazonaws.com` |
+| cloud9       | `https://{random_id}.vfs.cloud9.{region}.amazonaws.com` |
+| mediastore   | `https://{random_id}.data.mediastore.{region}.amazonaws.com` |
+| kinesisvideo | `https://{random_id}.kinesisvideo.{region}.amazonaws.com` |
+| mediaconvert | `https://{random_id}.mediaconvert.{region}.amazonaws.com` |
+| mediapackage | `https://{random_id}.mediapackage.{region}.amazonaws.com/in/v1/{random_id}/channel` |
+
+#### 1.9. BASIC TUTORIAL TO CREATE A KALI LINUX EC2 VM ON AWS
 
 - Step 1 - Log in to the AWS Console and go to EC2 → Instances → Launch Instance.
 - Step 3 - Name your instance (e.g., Kali-Linux-VM).
@@ -442,7 +472,8 @@ Key Capabilities (from AWS documentation):
 
 - AUDIT TOOL N°1 - [SCOUTSUITE](https://github.com/nccgroup/ScoutSuite)  
   - Scout Suite is an open source multi-cloud security-auditing tool, which enables security posture assessment of cloud environments. Using the APIs exposed by cloud providers, Scout Suite gathers configuration data for manual inspection and highlights risk areas. Rather than going through dozens of pages on the web consoles, Scout Suite presents a clear view of the attack surface automatically.
-  - Scout Suite was designed by security consultants/auditors. It is meant to provide a point-in-time security-oriented view of the cloud account it was run in. Once the data has been gathered, all usage may be performed offline.
+  - Scout Suite was designed by security consultants/auditors. It is meant to provide a point-in-time security-oriented view of the cloud account it was run in. Once the data has been gathered, all usage may be performed offline.  
+    
   ```
   ----------------
   Install via Git
@@ -662,8 +693,10 @@ Key Capabilities (from AWS documentation):
   + Unused Network ACLs
   ```
 
+  
 - AUDIT TOOL N°2 - [PROWLER](https://github.com/prowler-cloud/prowler)  
   - Prowler is an Open Cloud Security platform trusted by thousands to automate security and compliance in any cloud environment. With hundreds of ready-to-use checks and compliance frameworks, Prowler delivers real-time, customizable monitoring and seamless integrations, making cloud security simple, scalable, and cost-effective for organizations of any size.
+    
   ```
   --------------------------------------------------------------
   Install Prowler CLI - Pip package (with Python >3.9.1, <3.13)
@@ -1155,33 +1188,6 @@ Link - https://aws.amazon.com/pt/security/penetration-testing/
     
   - Stratus Red Team - It is "Atomic Red Team™" for the cloud, allowing to emulate offensive attack techniques in a granular and self-contained manner.
     - https://github.com/DataDog/stratus-red-team
+
+  - ...
    
-
-#### 3.4. OTHER - URL Services
-
-| Service      | URL                   |
-|--------------|-----------------------|
-| s3           | `https://{user_provided}.s3.amazonaws.com` |
-| cloudfront   | `https://{random_id}.cloudfront.net` |
-| ec2          | `https://ec2-{ip-seperated}.compute-1.amazonaws.com` |
-| es           | `https://{user_provided}-{random_id}.{region}.es.amazonaws.com` |
-| elb          | `http://{user_provided}-{random_id}.{region}.elb.amazonaws.com:80/443` |
-| elbv2        | `https://{user_provided}-{random_id}.{region}.elb.amazonaws.com` |
-| rds          | `mysql://{user_provided}.{random_id}.{region}.rds.amazonaws.com:3306` |
-| rds          | `postgres://{user_provided}.{random_id}.{region}.rds.amazonaws.com:5432` |
-| route 53     | `{user_provided}` |
-| execute-api  | `https://{random_id}.execute-api.{region}.amazonaws.com/{user_provided}` |
-| cloudsearch  | `https://doc-{user_provided}-{random_id}.{region}.cloudsearch.amazonaws.com` |
-| transfer     | `sftp://s-{random_id}.server.transfer.{region}.amazonaws.com` |
-| iot          | `mqtt://{random_id}.iot.{region}.amazonaws.com:8883` |
-| iot          | `https://{random_id}.iot.{region}.amazonaws.com:8443` |
-| iot          | `https://{random_id}.iot.{region}.amazonaws.com:443` |
-| mq           | `https://b-{random_id}-{1,2}.mq.{region}.amazonaws.com:8162` |
-| mq           | `ssl://b-{random_id}-{1,2}.mq.{region}.amazonaws.com:61617` |
-| kafka        | `b-{1,2,3,4}.{user_provided}.{random_id}.c{1,2}.kafka.{region}.amazonaws.com` |
-| kafka        | `{user_provided}.{random_id}.c{1,2}.kafka.useast-1.amazonaws.com` |
-| cloud9       | `https://{random_id}.vfs.cloud9.{region}.amazonaws.com` |
-| mediastore   | `https://{random_id}.data.mediastore.{region}.amazonaws.com` |
-| kinesisvideo | `https://{random_id}.kinesisvideo.{region}.amazonaws.com` |
-| mediaconvert | `https://{random_id}.mediaconvert.{region}.amazonaws.com` |
-| mediapackage | `https://{random_id}.mediapackage.{region}.amazonaws.com/in/v1/{random_id}/channel` |
