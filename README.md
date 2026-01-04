@@ -1,11 +1,16 @@
 ## AWS Cloud Security Assessment
-Audit & pentest methodology, technical notes, list of tools, scripts and commands that are useful for assessing the security posture of an AWS Cloud environment.<br>
+Technical notes, audit & pentest methodology, list of tools, scripts and commands that are useful for assessing the security posture of an AWS Cloud environment.<br>
 
 ### Table of contents 
 - I. AWS Cloud Essentials - Reminder
+
+  - [1.1. Introduction](#1-1-Introduction)
   - 1.1. Introduction
+  - [1.2. Main AWS services across IaaS, PaaS, and SaaS](#1-2-Main-AW-services-across-IaaS-PaaS-and-SaaS)
   - 1.2. Main AWS services across IaaS, PaaS, and SaaS
+  - [1.3. AWS Security Best Practices](#1-3-AWS-Security-Best-Practices)
   - 1.3. AWS Security Best Practices
+  - [1.4. Key Differences Between IAM User, Role, and Group](#1-4-Key-Differences-Between-IAM-User-Role-and-Group)
   - 1.4. IAM Users vs. IAM Roles — Key Differences
   - 1.5. Cloud‑Native Application Protection Platforms (CNAPP)
   - 1.6. How to use the AWS CLI
@@ -13,11 +18,11 @@ Audit & pentest methodology, technical notes, list of tools, scripts and command
   - 1.8. Basic tutorial to create a Kali Linux EC2 VM on AWS
 
 - II. AWS Security Audit
-  - 2.1. Run AWS security scans with audit tools to identify security misconfiguration
+  - 2.1. Run AWS security scans with audit tools to identify potential security misconfiguration
     - CloudSuite
     - Prowler
     - CloudSploit
-  - 2.2. Check for known privesc attack vectors in AWS
+  - 2.2. Check for known privesc attack vectors in AWS (mostly IAM service)
 
 - III. AWS Penetration Testing
   - 3.1. AWS Pentest scope and rules of engagement
@@ -26,7 +31,7 @@ Audit & pentest methodology, technical notes, list of tools, scripts and command
 
 ----------------
 
-### I. AWS Cloud Essentials 
+### I. AWS Cloud Essentials - Reminder
 
 #### 1.1. Introduction
 
@@ -149,25 +154,40 @@ Balancer access logging, to gain visibility into events. Configure logs to flow 
   - 3. Practice responding to events.
     - Simulate and practice incident response by running regular game days, incorporating the lessons learned into your incident management plans, and continuously improving them.
 
-#### 1.4. IAM Users vs. IAM Roles — Key Differences
-  - Credential Type
-    - IAM Users: Have long‑lived credentials — passwords and access keys that persist until manually rotated.
-    - IAM Roles: Provide temporary credentials issued by STS that automatically expire, reducing risk if compromised.
-  - Intended Use
-    - IAM Users: Designed for human access (admins, developers) who need console login or programmatic access.
-    - IAM Roles: Designed for AWS services, applications, and cross‑account access — not for direct login.
-  - How Access Is Granted
-    - IAM Users: Are directly assigned permissions via policies attached to the user or their groups.
-    - IAM Roles: Have no inherent permissions — they gain permissions only when someone or something assumes the role.
-  - Security Model
-    - IAM Users: Higher risk because static keys can leak, be stolen, or be forgotten in code repositories.
-    - IAM Roles: More secure by default thanks to short‑lived credentials, MFA‑protected assumption, and better auditability.
-  - Trust Relationships
-    - IAM Users: Do not use trust policies — they authenticate with their own credentials.
-    - IAM Roles: Use trust policies to define who is allowed to assume the role (users, services, accounts).
-  - Audit & Traceability
-    - IAM Users: Actions are logged under the user’s identity.
-    - IAM Roles: Actions are logged under the role, but CloudTrail shows who assumed the role, improving accountability.
+#### 1.4. Key Differences Between IAM User, Role, and Group
+
+  - IAM Users
+    - User = A long‑term identity with permanent credentials (password, access keys).
+    - Users authenticate directly, while roles require AssumeRole to obtain temporary credentials.
+    - Users are for humans or applications, roles are for delegation and cross‑account access, and groups are for permission management.
+
+  - IAM Roles
+    - Role = An identity that provides temporary credentials and must be assumed via STS; it has no password or access keys of its own.
+    - Roles are commonly used by AWS services (EC2, Lambda, etc.) to access other AWS resources securely.
+
+  - IAM Group
+    - A container for users that lets you assign permissions to many users at once; it is not an identity and cannot be assumed.
+    - Groups cannot contain other groups (no nesting), and they cannot be used by AWS services.
+
+  - IAM Users vs. IAM Roles — Key Differences
+    - Credential Type
+      - IAM Users: Have long‑lived credentials — passwords and access keys that persist until manually rotated.
+      - IAM Roles: Provide temporary credentials issued by STS that automatically expire, reducing risk if compromised.
+    - Intended Use
+      - IAM Users: Designed for human access (admins, developers) who need console login or programmatic access.
+      - IAM Roles: Designed for AWS services, applications, and cross‑account access — not for direct login.
+    - How Access Is Granted
+      - IAM Users: Are directly assigned permissions via policies attached to the user or their groups.
+      - IAM Roles: Have no inherent permissions — they gain permissions only when someone or something assumes the role.
+    - Security Model
+      - IAM Users: Higher risk because static keys can leak, be stolen, or be forgotten in code repositories.
+      - IAM Roles: More secure by default thanks to short‑lived credentials, MFA‑protected assumption, and better auditability.
+    - Trust Relationships
+      - IAM Users: Do not use trust policies — they authenticate with their own credentials.
+      - IAM Roles: Use trust policies to define who is allowed to assume the role (users, services, accounts).
+    - Audit & Traceability
+      - IAM Users: Actions are logged under the user’s identity.
+      - IAM Roles: Actions are logged under the role, but CloudTrail shows who assumed the role, improving accountability.
 
 
 #### 1.5. Cloud‑Native Application Protection Platforms (CNAPP)
@@ -249,71 +269,71 @@ Key Capabilities (from AWS documentation):
   
 - Step 3 - Configure the AWS CLI
   - Method 1 — Using aws configure (recommended for beginners)
-  ```
-  $ aws configure
-  -> You will be prompted for:
-   AWS Access Key ID: <paste your key>
-   AWS Secret Access Key: <paste your secret>
-   Default region name: eu-west-1 (or your region)
-   Default output format: json
-  
-  -> This creates a config file in:
-  For Linux/macOS: ~/.aws/credentials and ~/.aws/config
-  For Windows: C:\Users\<you>\.aws\credentials
-
-  Where Your Credentials Are Stored
-  ---------------------------------
-  $ cat ~/.aws/credentials
-  
-  [default]
-  aws_access_key_id = AKIA...
-  aws_secret_access_key = abc123...
-  
-  [myprofile]
-  aws_access_key_id = AKIA...
-  aws_secret_access_key = xyz789...
-  ```
-
-  - Method 2 — Using named profiles (Great when you manage multiple AWS accounts)
-  ```
-  $ aws configure --profile myprofile
+    ```
+    $ aws configure
     -> You will be prompted for:
      AWS Access Key ID: <paste your key>
      AWS Secret Access Key: <paste your secret>
      Default region name: eu-west-1 (or your region)
      Default output format: json
-  ```
+    
+    -> This creates a config file in:
+    For Linux/macOS: ~/.aws/credentials and ~/.aws/config
+    For Windows: C:\Users\<you>\.aws\credentials
+  
+    Where Your Credentials Are Stored
+    ---------------------------------
+    $ cat ~/.aws/credentials
+    
+    [default]
+    aws_access_key_id = AKIA...
+    aws_secret_access_key = abc123...
+    
+    [myprofile]
+    aws_access_key_id = AKIA...
+    aws_secret_access_key = xyz789...
+    ```
+
+  - Method 2 — Using named profiles (Great when you manage multiple AWS accounts)
+    ```
+    $ aws configure --profile myprofile
+      -> You will be prompted for:
+       AWS Access Key ID: <paste your key>
+       AWS Secret Access Key: <paste your secret>
+       Default region name: eu-west-1 (or your region)
+       Default output format: json
+    ```
 
   - Method 3 — Using environment variables (export)
     </i> Useful for: Temporary sessions, CI/CD pipelines, avoiding writing credentials to disk. </i>
-  ```
-  $ export AWS_ACCESS_KEY_ID="<your key>"
-  $ export AWS_SECRET_ACCESS_KEY="<your secret>"
-  $ export AWS_DEFAULT_REGION="eu-west-1"
-  $ export AWS_SESSION_TOKEN="<token>"   # only if using temporary credentials
-  
-  Note: You can aslo use profiles if you want. In that case run first the command: export AWS_PROFILE="myprofile"
-  ```
+    ```
+    $ export AWS_ACCESS_KEY_ID="<your key>"
+    $ export AWS_SECRET_ACCESS_KEY="<your secret>"
+    $ export AWS_DEFAULT_REGION="eu-west-1"
+    $ export AWS_SESSION_TOKEN="<token>"   # only if using temporary credentials
+    
+    Note: You can aslo use profiles if you want. In that case run first the command: export AWS_PROFILE="myprofile"
+    ```
 
 - Step 4 - Test Your Connection
   - Method 1 (without profile)
-  ```
-  $ aws sts get-caller-identity
-  {
-      "UserId": "EXAMPLE",
-      "Account": "123456789012",
-      "Arn": "arn:aws:iam::123456789012:user/your-user"
-  }
+    ```
+    $ aws sts get-caller-identity
+    {
+        "UserId": "EXAMPLE",
+        "Account": "123456789012",
+        "Arn": "arn:aws:iam::123456789012:user/your-user"
+    }
   ```
   - Method 2 (with profile)
-  ```
-  $ aws --profile myprofile sts get-caller-identity
-  {
-      "UserId": "EXAMPLE",
-      "Account": "123456789012",
-      "Arn": "arn:aws:iam::123456789012:user/your-user"
-  }
-  ```
+    ```
+    $ aws --profile myprofile sts get-caller-identity
+    {
+        "UserId": "EXAMPLE",
+        "Account": "123456789012",
+        "Arn": "arn:aws:iam::123456789012:user/your-user"
+    }
+    ```
   
 
 #### 1.7. List of usefull AWS CLI commands
@@ -390,10 +410,9 @@ Key Capabilities (from AWS documentation):
 - Step 3 - Name your instance (e.g., Kali-Linux-VM).
 - Step 4 - Under Application and OS Images (AMI), click Browse more AMIs, search for “Kali Linux”, and select the official Kali AMI from AWS Marketplace.
 - Step 5 - When prompted, accept the subscription (Kali AMIs are free, you only pay for compute).
-- Step 6 - Under Instance type, choose the option/config you want. Below are the cheapest options:
+- Step 6 - Under Instance type, choose the option/config you want. Below are example of the cheapest options:
   - t2.small (Specs: 1 vCPU, 2 GiB RAM, Burstable CPU)
   - t3.micro (Specs: 2 vCPUs, 1 GiB RAM, Better performance than t2.micro)
-  - t2.micro (Specs: 1 vCPU, 1 GiB RAM, Burstable CPU, Free‑tier eligible)
 - Step 7 - Under Key pair, create a new SSH key pair or select an existing one.
 - Step 8 - Under Network settings, allow SSH (port 22) from your public IP only (recommended for security).
 - Step 9 - Keep storage at the default (usually 8–10 GB gp2), which is the cheapest option.
@@ -406,7 +425,8 @@ Key Capabilities (from AWS documentation):
 
 ### II. AWS SECURITY AUDIT
 
-#### A. Run AWS security scans with tools like CloudSuite, Prowler and CloudSploit.
+#### 2.1. Run AWS security scans with audit tools to identify security misconfiguration
+
 - Using an AWS account run tools and scripts that will extract and analyse the AWS environment looking for potential security misconfiguration, and other security issues in key services such as IAM, EC2, Lambda and S3.
 - Minimum Roles & Privileges for AWS Security Audit Tools (General Guidance)
   ```
@@ -422,7 +442,7 @@ Key Capabilities (from AWS documentation):
     + kms:ListKeys, kms:DescribeKey
   ```
 
-- Security Tool n°1 - [SCOUTSUITE](https://github.com/nccgroup/ScoutSuite)  
+- AUDIT TOOL n°1 - [SCOUTSUITE](https://github.com/nccgroup/ScoutSuite)  
   - Scout Suite is an open source multi-cloud security-auditing tool, which enables security posture assessment of cloud environments. Using the APIs exposed by cloud providers, Scout Suite gathers configuration data for manual inspection and highlights risk areas. Rather than going through dozens of pages on the web consoles, Scout Suite presents a clear view of the attack surface automatically.
   - Scout Suite was designed by security consultants/auditors. It is meant to provide a point-in-time security-oriented view of the cloud account it was run in. Once the data has been gathered, all usage may be performed offline.
   ```
@@ -558,12 +578,93 @@ Key Capabilities (from AWS documentation):
   2026-01-03 20:11:52 kali scout[2717] INFO Creating ./cloudsuite-scan-test.html
   ```
   ```
-  ----------------------
-   Example of findings 
-  ----------------------
+  -------------------------------------------------------------------------------------
+  Basic example of checks and findings that we can find in the report for IAM/EC2/VPC
+  -------------------------------------------------------------------------------------
+  
+  ----- IAM service -----
+  
+  Danger (Red) 
+  + AssumeRole Policy Allows All Principals
+  + Credentials Unused for 90 Days or Greater Are Not Disabled
+  + Cross-Account AssumeRole Policy Lacks External ID and MFA
+  + Lack of Key Rotation for 90 Days (Key Status: Active)
+  + Managed Policy Allows All Actions
+  + Minimum Password Length Too Short
+  + Password Expiration Disabled
+  + Password Policy Allows the Reuse of Passwords
+  + Passwords Expire after 90 Days
+  + Root Account Used Recently
+  + Root Account without Hardware MFA 
+  
+  Good (Green)
+  + Group with Inline Policies
+  + Group with No Users
+  + Lack of Key Rotation for 90 Days (Key Status: Inactive)
+  + Managed Policy Allows "iam:PassRole" For All Resources
+  + Managed Policy Allows "NotActions"
+  + Managed Policy Allows "sts:AssumeRole" For All Resources
+  + Managed Policy Not Attached to Any Entity
+  + Policy with Denied User Actions for Group Objects
+  + Role with Inline Policies
+  + Root Account Has Active Keys
+  + Root Account Has Active X.509 Certs
+  + Root Account without MFA
+  + User with inline Policies
+  + User with Multiple API Keys
+  + User with Password and Keys Enabled
+  + User without MFA 
+  
+  ----- EC2 service -----
+
+  Danger (Red) 
+  + EBS Volume Not Encrypted
+  + Security Group Opens SSH Port to All
+  
+  Warning (Amber)
+  + EBS Encryption By Default Is Disabled
+  + Non-empty Rulesets for Default Security Groups
+  + Security Group Opens All Ports
+  + Unrestricted Network Traffic within Security Group
+  + Unused Security Group 
+  
+  Good (Green)
+  + Default Security Groups in Use
+  + Potential Secret in Instance User Data
+  + Security Group Allows ICMP Traffic to All
+  + Security Group Opens All Ports to All
+  + Security Group Opens DNS Port to All
+  + Security Group Opens FTP Port
+  + Security Group Opens MongoDB Port to All
+  + Security Group Opens MsSQL Port to All
+  + Security Group Opens MySQL Port to All
+  + Security Group Opens NFS Port to All
+  + Security Group Opens Oracle DB Port to All
+  + Security Group Opens PostgreSQL Port to All
+  + Security Group Opens RDP Port to All
+  + Security Group Opens SMTP Port to All
+  + Security Group Opens TCP Port to All
+  + Security Group Opens Telnet Port
+  + Security Group Opens UDP Port to All
+  + Security Group Uses Port Range
+  + Security Group Whitelists AWS CIDRs
+
+  ----- VPC Dashboard -----
+  
+  Warning (Amber)
+  + Network ACLs Allow All egress Traffic (default)
+  + Network ACLs Allow All ingress Traffic (default)
+  + Subnet with "Allow All" egress NACLs
+  + Subnet with "Allow All" ingress NACLs
+  + Subnet without a Flow Log
+  
+  Good (Green)
+  + Network ACLs Allow All egress Traffic (custom)
+  + Network ACLs Allow All ingress Traffic (custom)
+  + Unused Network ACLs
   ```
 
-- Security Tool n°2 - [PROWLER](https://github.com/prowler-cloud/prowler)  
+- AUDIT TOOL n°2 - [PROWLER](https://github.com/prowler-cloud/prowler)  
   - Prowler is an Open Cloud Security platform trusted by thousands to automate security and compliance in any cloud environment. With hundreds of ready-to-use checks and compliance frameworks, Prowler delivers real-time, customizable monitoring and seamless integrations, making cloud security simple, scalable, and cost-effective for organizations of any size.
   ```
   --------------------------------------------------------------
@@ -812,7 +913,7 @@ Key Capabilities (from AWS documentation):
                                                                   
   ```
 
-- Securitycret Tool n°1 - [CLOUDSPLOIT](https://github.com/aquasecurity/cloudsploit) 
+- AUDIT TOOL n°3 - [CLOUDSPLOIT](https://github.com/aquasecurity/cloudsploit) 
   - It is an open-source project designed to allow detection of security risks in cloud infrastructure accounts, including: Amazon Web Services (AWS), Microsoft Azure, Google Cloud Platform (GCP), Oracle Cloud Infrastructure (OCI), and GitHub. These scripts are designed to return a series of potential misconfigurations and security risks.
   ```
   -------------
@@ -882,7 +983,7 @@ Key Capabilities (from AWS documentation):
                           logic will assume cloud from config.js file based on
                           provided credentials
     --run-asl             When set, it will execute custom plugins.
-   ``` 
+  ```
   ```
   ------------------
   Example of command
@@ -890,7 +991,7 @@ Key Capabilities (from AWS documentation):
   $ docker run --rm -e AWS_ACCESS_KEY_ID=XXXXX -e AWS_SECRET_ACCESS_KEY=YYYYYYY cloudsploit:0.0.1 --cloud aws 
   ```
   
-#### B. Check for known privesc attack vectors in AWS
+#### 2. Check for known privesc attack vectors in AWS (mostly IAM)
   
 - Usefull ressources:
   - https://github.com/RhinoSecurityLabs/AWS-IAM-Privilege-Escalation
@@ -947,8 +1048,9 @@ Key Capabilities (from AWS documentation):
 
 https://pentestbook.six2dez.com/enumeration/cloud/aws
 https://www.hackerone.com/knowledge-center/penetration-testing-aws-practical-guide
+https://github.com/dafthack/CloudPentestCheatsheets/blob/master/cheatsheets/AWS.md
 
-#### A. Black-box penetration test (we start with no account)
-#### B. Grey-box penetration test (we start with 1 low-privileged Windows account)
+#### 2. Black-box penetration test (we start with no account)
+#### 3. Grey-box penetration test (we start with 1 low-privileged Windows account)
 
 
