@@ -4,13 +4,13 @@ Technical notes, audit & pentest methodology, list of tools, scripts and command
 ### Table of contents 
 - I. AWS Cloud Essentials - Reminder
 
-  - [1.1. Introduction](#-1-1-Introduction-)
+  - [1.1. Introduction](#11-Introduction-)
   - 1.1. Introduction
-  - [1.2. Main AWS services across IaaS, PaaS, and SaaS](#1-2-Main-AW-services-across-IaaS-PaaS-and-SaaS-)
+  - [1.2. Main AWS services across IaaS, PaaS, and SaaS](#12-Main-AW-services-across-IaaS-PaaS-and-SaaS-)
   - 1.2. Main AWS services across IaaS, PaaS, and SaaS
-  - [1.3. AWS Security Best Practices](#1-3-AWS-Security-Best-Practices-)
+  - [1.3. AWS Security Best Practices](#13-AWS-Security-Best-Practices-)
   - 1.3. AWS Security Best Practices
-  - [1.4. Key Differences Between IAM User, Role, and Group](#1-4-Key-Differences-Between-IAM-User-Role-and-Group-)
+  - [1.4. Key Differences Between IAM User, Role, and Group](#14-Key-Differences-Between-IAM-User-Role-and-Group-)
   - 1.4. IAM Users vs. IAM Roles — Key Differences
   - 1.5. Cloud‑Native Application Protection Platforms (CNAPP)
   - 1.6. How to use the AWS CLI
