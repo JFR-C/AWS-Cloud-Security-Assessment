@@ -3,7 +3,7 @@ Technical notes, audit & pentest methodology, list of tools, scripts and command
 
 ### Table of contents 
 - I. AWS Cloud Essentials - Reminder
-  - [1.1. Introduction](#11-Introduction)
+  - [1.1. Introduction](#11-INTRODUCTION)
   - [1.2. Main AWS services across IaaS, PaaS, and SaaS](#12-main-aws-services-across-iaas-paas-and-saas)
   - [1.3. AWS Security Best Practices](#13-AWS-Security-Best-Practices)
   - [1.4. Key Differences Between IAM User, Role, and Group](#14-Key-Differences-Between-IAM-User-Role-and-Group)
@@ -13,11 +13,12 @@ Technical notes, audit & pentest methodology, list of tools, scripts and command
   - [1.8. Basic tutorial to create a Kali Linux EC2 VM on AWS](#18-Basic-tutorial-to-create-a-Kali-Linux-EC2-VM-on-AWS)
 
 - II. AWS Security Audit
-  - [2.1. Run AWS security scans with audit tools to identify potential security misconfiguration](#21-run-aws-security-scans-with-audit-tools-to-identify-security-misconfiguration)
+  - [2.1. Run AWS security scans using audit tools to identify potential misconfigurations](#21-run-aws-security-scans-using-audit-tools-to-identify-potential-security-misconfigurations)
     - CloudSuite
     - Prowler
     - CloudSploit
-  - [2.2. Check for known privesc attack vectors in AWS (mostly IAM service)](#22-check-for-known-privesc-attack-vectors-in-aws-mostly-iam)
+    - Cloudsplaining
+  - [2.2. Check for known privesc attack vectors in AWS (mostly IAM service)](#22-check-for-known-privesc-attack-vectors-in-aws)
 
 - III. AWS Penetration Testing
   - 3.1. AWS Pentest scope and rules of engagement
@@ -300,8 +301,8 @@ Key Capabilities (from AWS documentation):
        Default output format: json
     ```
 
-  - Method 3 — Using environment variables (export)
-    </i> Useful for: Temporary sessions, CI/CD pipelines, avoiding writing credentials to disk. </i>
+  - Method 3 — Using environment variables (export)  
+    <i/> Useful for: Temporary sessions, CI/CD pipelines, avoiding writing credentials to disk. </i>
     ```
     $ export AWS_ACCESS_KEY_ID="<your key>"
     $ export AWS_SECRET_ACCESS_KEY="<your secret>"
@@ -320,7 +321,7 @@ Key Capabilities (from AWS documentation):
         "Account": "123456789012",
         "Arn": "arn:aws:iam::123456789012:user/your-user"
     }
-  ```
+    ```
   - Method 2 (with profile)
     ```
     $ aws --profile myprofile sts get-caller-identity
@@ -396,6 +397,7 @@ Key Capabilities (from AWS documentation):
 | RDS | List all RDS Snapshots | aws rds describe-db-snapshots --region us-east-1 --snapshot-type manual --query=DBSnapshots[*].DBSnapshotIdentifier | 
 | Lambda (Serverless) | List all Lambda functions in the specified region, including their configuration details (up to 50 per call) | aws lambda list-functions --region region | 
 | Lambda (Serverless) | Look at environment variables set for secrets and analyze code | aws lambda get-function --function-name lambda-function-name | 
+| Lambda (Serverless) | Extract Lambda function's code | aws lambda list-functions --profile uploadcreds \ aws lambda get-function --function-name "LAMBDA-NAME-HERE-FROM-PREVIOUS-QUERY" --query 'Code.Location' --profile uploadcreds \ wget -O lambda-function.zip url-from-previous-query --profile uploadcreds | 
 | Kubernetes (EKS) | List EKS clusters | aws eks list-clusters --region region | 
 | Kubernetes (EKS) | Update kubeconfig | aws eks update-kubeconfig --name cluster-name --region region | 
 
@@ -421,7 +423,7 @@ Key Capabilities (from AWS documentation):
 
 ### II. AWS SECURITY AUDIT
 
-#### 2.1. Run AWS security scans with audit tools to identify security misconfiguration
+#### 2.1. RUN AWS SECURITY SCANS USING AUDIT TOOLS TO IDENTIFY POTENTIAL SECURITY MISCONFIGURATIONS
 
 - Using an AWS account run tools and scripts that will extract and analyse the AWS environment looking for potential security misconfiguration, and other security issues in key services such as IAM, EC2, Lambda and S3.
 - Minimum Roles & Privileges for AWS Security Audit Tools (General Guidance)
@@ -438,7 +440,7 @@ Key Capabilities (from AWS documentation):
     + kms:ListKeys, kms:DescribeKey
   ```
 
-- AUDIT TOOL n°1 - [SCOUTSUITE](https://github.com/nccgroup/ScoutSuite)  
+- AUDIT TOOL N°1 - [SCOUTSUITE](https://github.com/nccgroup/ScoutSuite)  
   - Scout Suite is an open source multi-cloud security-auditing tool, which enables security posture assessment of cloud environments. Using the APIs exposed by cloud providers, Scout Suite gathers configuration data for manual inspection and highlights risk areas. Rather than going through dozens of pages on the web consoles, Scout Suite presents a clear view of the attack surface automatically.
   - Scout Suite was designed by security consultants/auditors. It is meant to provide a point-in-time security-oriented view of the cloud account it was run in. Once the data has been gathered, all usage may be performed offline.
   ```
@@ -660,7 +662,7 @@ Key Capabilities (from AWS documentation):
   + Unused Network ACLs
   ```
 
-- AUDIT TOOL n°2 - [PROWLER](https://github.com/prowler-cloud/prowler)  
+- AUDIT TOOL N°2 - [PROWLER](https://github.com/prowler-cloud/prowler)  
   - Prowler is an Open Cloud Security platform trusted by thousands to automate security and compliance in any cloud environment. With hundreds of ready-to-use checks and compliance frameworks, Prowler delivers real-time, customizable monitoring and seamless integrations, making cloud security simple, scalable, and cost-effective for organizations of any size.
   ```
   --------------------------------------------------------------
@@ -909,7 +911,7 @@ Key Capabilities (from AWS documentation):
                                                                   
   ```
 
-- AUDIT TOOL n°3 - [CLOUDSPLOIT](https://github.com/aquasecurity/cloudsploit) 
+- AUDIT TOOL N°3 - [CLOUDSPLOIT](https://github.com/aquasecurity/cloudsploit) 
   - It is an open-source project designed to allow detection of security risks in cloud infrastructure accounts, including: Amazon Web Services (AWS), Microsoft Azure, Google Cloud Platform (GCP), Oracle Cloud Infrastructure (OCI), and GitHub. These scripts are designed to return a series of potential misconfigurations and security risks.
   ```
   -------------
@@ -986,8 +988,40 @@ Key Capabilities (from AWS documentation):
   ------------------
   $ docker run --rm -e AWS_ACCESS_KEY_ID=XXXXX -e AWS_SECRET_ACCESS_KEY=YYYYYYY cloudsploit:0.0.1 --cloud aws 
   ```
+
+- AUDIT TOOL N°4 - [Cloudsplaining](https://github.com/salesforce/cloudsplaining)
+  - Cloudsplaining is an AWS IAM Security Assessment tool that identifies violations of least privilege and generates a risk-prioritized report.
+
+  ```
+  --------------------
+  Install using PIP3
+  --------------------
+  $ virtualenv -p python3 venv2
+  $ source venv2/bin/activate
+  $ pip3 install --user cloudsplaining
+  ```
+  ```
+  ------------------------------------------------------
+  Example of command -  Scanning an entire AWS Account
+  ------------------------------------------------------
+  - You must have AWS credentials configured that can be used by the CLI.
+  - You must have the privileges to run iam:GetAccountAuthorizationDetails.
+    The arn:aws:iam::aws:policy/SecurityAudit policy includes this, as do many others that allow Read access to the IAM Service.
+
+  Step 1. Downloading Account Authorization Details
+  $ cloudsplaining download                      #If you use environment variables 
+  $ cloudsplaining download --profile myprofile  #With a profile (~/.aws/credentials)
+
+  Step 2. Create Exclusions file
+  cloudsplaining create-exclusions-file          #Follow instructions from the Github project 
   
-#### 2.2. Check for known privesc attack vectors in AWS (mostly IAM)
+  Step 3. Scanning the Authorization Details file
+  $ cloudsplaining scan --exclusions-file exclusions.yml --input-file examples/files/example.json --output examples/files/
+  -> It will create an HTML report and a JSON report.
+  ```
+
+  
+#### 2.2. CHECK FOR KNOWN PRIVESC ATTACK VECTORS IN AWS
   
 - Usefull ressources:
   - https://github.com/RhinoSecurityLabs/AWS-IAM-Privilege-Escalation
@@ -1042,11 +1076,112 @@ Key Capabilities (from AWS documentation):
 
 ### III. AWS PENETRATION TESTING
 
-https://pentestbook.six2dez.com/enumeration/cloud/aws
-https://www.hackerone.com/knowledge-center/penetration-testing-aws-practical-guide
-https://github.com/dafthack/CloudPentestCheatsheets/blob/master/cheatsheets/AWS.md
+#### 3.1. AWS CUSTOMER SUPPORT AND SERVICE POLICY FOR PENETRATION TESTING
 
-#### 2. Black-box penetration test (we start with no account)
-#### 3. Grey-box penetration test (we start with 1 low-privileged Windows account)
+Link - https://aws.amazon.com/pt/security/penetration-testing/
 
+- AWS customers are welcome to carry out security assessments or penetration tests of their AWS infrastructure without prior approval for the services listed in the next section under “Permitted Services.” Additionally, AWS permits customers to host their security assessment tooling within the AWS IP space or other cloud provider for on-prem, in AWS, or third party contracted testing. All security testing that includes Command and Control (C2) requires prior approval.
+- Note: Customers are not permitted to conduct any security assessments of AWS infrastructure or the AWS services themselves. If you discover a security issue within any of the AWS services observed in your security assessment, please contact AWS Security immediately.
 
+- Permitted Services
+  - Amazon EC2 instances, WAF, NAT Gateways, and Elastic Load Balancers
+  - Amazon RDS
+  - Amazon CloudFront
+  - Amazon Aurora
+  - Amazon API Gateways
+  - AWS AppSync
+  - AWS Lambda and Lambda Edge functions
+  - Amazon Lightsail resources
+  - Amazon Elastic Beanstalk environments
+  - Amazon Elastic Container Service
+  - AWS Fargate
+  - Amazon OpenSearch Service
+  - Amazon FSx
+  - Amazon Transit Gateway
+
+- Prohibited Activities  
+  <i/> Customers seeking to test non approved services will need to work directly with AWS Support or your account representative.</i> 
+  - DNS zone walking via Amazon Route 53 Hosted Zones
+  - DNS hijacking via Route 53
+  - DNS Pharming via Route 53
+  - Denial of Service (DoS), Distributed Denial of Service (DDoS),
+  - Simulated DoS, Simulated DDoS (These are subject to the DDoS Simulation Testing policy Port flooding
+  - Protocol flooding
+  - Request flooding (login request flooding, API request flooding)
+  - S3 bucket takeover
+  - Subdomain Takeover
+
+- Prohibited Services for Outbound Penetration Testing
+  - Amazon API Gateway
+
+#### 3.2. AWS PENTEST METHODOLOGY - USEFULL RESSOURCES
+
+  - https://github.com/swisskyrepo/InternalAllTheThings/tree/main/docs/cloud/aws
+  - https://pentestbook.six2dez.com/enumeration/cloud/aws
+  - https://github.com/CyberSecurityUP/Awesome-Cloud-PenTest
+  - https://github.com/CyberSecurityUP/Cloud-Security-Attacks
+  - https://www.hackerone.com/knowledge-center/penetration-testing-aws-practical-guide
+  - https://github.com/dafthack/CloudPentestCheatsheets/blob/master/cheatsheets/AWS.md
+ 
+
+#### 3.3. LIST OF AWS PENTEST TOOLS
+  
+  - PACU - The AWS exploitation framework, designed for testing the security of Amazon Web Services environments.
+    - https://github.com/RhinoSecurityLabs/pacu
+      
+  - Cloud_enum - Multi-cloud OSINT tool. Enumerate public resources in AWS, Azure, and Google Cloud.
+    - https://github.com/initstring/cloud_enum
+      
+  - CloudFox - Automating situational awareness for cloud penetration tests.
+    - https://github.com/BishopFox/CloudFox/
+
+  - S3Scanner - Scan for misconfigured S3 buckets across S3-compatible APIs.
+    - https://github.com/sa7mon/S3Scanner
+  
+  - S3_objects_check - Whitebox evaluation of effective S3 object permissions, to identify publicly accessible files.
+    - https://github.com/nccgroup/s3_objects_check
+      
+  - Enumerate-IAM - Enumerate the permissions associated with AWS credential set.
+    - https://github.com/andresriancho/enumerate-iam
+      
+  - IAMActionHunter - An AWS IAM policy statement parser and query tool.
+    - https://github.com/RhinoSecurityLabs/IAMActionHunter
+      
+  - AWS IAM Privilege Escalation Methods
+    - https://github.com/RhinoSecurityLabs/AWS-IAM-Privilege-Escalation
+      
+  - Orca-Security - Iam-ape - APE takes all of your AWS IAM policies attached to a User, Group, or Role object, and presents you with a single policy, summarizing all of their actual permissions. Taking into account permissions, denials, inherited permissions and permission boundaries!
+    - https://github.com/orcasecurity/orca-toolbox/tree/main/iam-ape
+    
+  - Stratus Red Team - It is "Atomic Red Team™" for the cloud, allowing to emulate offensive attack techniques in a granular and self-contained manner.
+    - https://github.com/DataDog/stratus-red-team
+   
+
+#### 3.4. OTHER - URL Services
+
+| Service      | URL                   |
+|--------------|-----------------------|
+| s3           | `https://{user_provided}.s3.amazonaws.com` |
+| cloudfront   | `https://{random_id}.cloudfront.net` |
+| ec2          | `https://ec2-{ip-seperated}.compute-1.amazonaws.com` |
+| es           | `https://{user_provided}-{random_id}.{region}.es.amazonaws.com` |
+| elb          | `http://{user_provided}-{random_id}.{region}.elb.amazonaws.com:80/443` |
+| elbv2        | `https://{user_provided}-{random_id}.{region}.elb.amazonaws.com` |
+| rds          | `mysql://{user_provided}.{random_id}.{region}.rds.amazonaws.com:3306` |
+| rds          | `postgres://{user_provided}.{random_id}.{region}.rds.amazonaws.com:5432` |
+| route 53     | `{user_provided}` |
+| execute-api  | `https://{random_id}.execute-api.{region}.amazonaws.com/{user_provided}` |
+| cloudsearch  | `https://doc-{user_provided}-{random_id}.{region}.cloudsearch.amazonaws.com` |
+| transfer     | `sftp://s-{random_id}.server.transfer.{region}.amazonaws.com` |
+| iot          | `mqtt://{random_id}.iot.{region}.amazonaws.com:8883` |
+| iot          | `https://{random_id}.iot.{region}.amazonaws.com:8443` |
+| iot          | `https://{random_id}.iot.{region}.amazonaws.com:443` |
+| mq           | `https://b-{random_id}-{1,2}.mq.{region}.amazonaws.com:8162` |
+| mq           | `ssl://b-{random_id}-{1,2}.mq.{region}.amazonaws.com:61617` |
+| kafka        | `b-{1,2,3,4}.{user_provided}.{random_id}.c{1,2}.kafka.{region}.amazonaws.com` |
+| kafka        | `{user_provided}.{random_id}.c{1,2}.kafka.useast-1.amazonaws.com` |
+| cloud9       | `https://{random_id}.vfs.cloud9.{region}.amazonaws.com` |
+| mediastore   | `https://{random_id}.data.mediastore.{region}.amazonaws.com` |
+| kinesisvideo | `https://{random_id}.kinesisvideo.{region}.amazonaws.com` |
+| mediaconvert | `https://{random_id}.mediaconvert.{region}.amazonaws.com` |
+| mediapackage | `https://{random_id}.mediapackage.{region}.amazonaws.com/in/v1/{random_id}/channel` |
