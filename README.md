@@ -263,7 +263,7 @@ Key Capabilities (from AWS documentation):
 
   Where Your Credentials Are Stored
   ---------------------------------
-  $ ls ~/.aws/credentials
+  $ cat ~/.aws/credentials
   
   [default]
   aws_access_key_id = AKIA...
@@ -315,36 +315,6 @@ Key Capabilities (from AWS documentation):
   }
   ```
   
-
-```bash
-# First of all, set your profile
-aws configure --profile test 
-set profile=test # Just for convenience
-
-# ~/.aws/credentials
-[default]
-aws_access_key_id = XXX
-aws_secret_access_key = XXXX
-
-export AWS_ACCESS_KEY_ID=
-export AWS_SECRET_ACCESS_KEY=
-export AWS_DEFAULT_REGION=
-
-# If we can steal AWS credentials, add to your configuration
-aws configure --profile stolen
-# Open ~/.aws/credentials
-# Under the [stolen] section add aws_session_token and add the discovered token value here
-aws sts get-caller-identity --profile stolen
-
-# Check valid
-aws sts get-caller-identity
-aws sdb list-domains --region us-east-1
-
-# SSH into created instance:
-ssh -i ".ssh/key.pem" <user>@<instance-ip>
-sudo mount /dev/xvdb1 /mnt
-cat /mnt/home/ubuntu/setupNginx.sh
-```
 
 #### 1.7. List of usefull AWS CLI commands
  
