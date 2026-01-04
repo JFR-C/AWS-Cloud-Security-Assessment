@@ -421,22 +421,12 @@ Key Capabilities (from AWS documentation):
     + config:Describe*
     + kms:ListKeys, kms:DescribeKey
   ```
-- Security Audit Tool n°1 - [CLOUDSPLOIT](https://github.com/aquasecurity/cloudsploit) 
-  - It is an open-source project designed to allow detection of security risks in cloud infrastructure accounts, including: Amazon Web Services (AWS), Microsoft Azure, Google Cloud Platform (GCP), Oracle Cloud Infrastructure (OCI), and GitHub. These scripts are designed to return a series of potential misconfigurations and security risks.
-  ```
-  Docker
-  ------
-  $ git clone https://github.com/aquasecurity/cloudsploit.git
-  $ cd cloudsploit
-  $ docker build . -t cloudsploit:0.0.1
-  $ docker run cloudsploit:0.0.1 -h
-  $ docker run -e AWS_ACCESS_KEY_ID=XX -e AWS_SECRET_ACCESS_KEY=YY cloudsploit:0.0.1 --compliance=pci
-  ```
 
-- Security Audit Tool n°2 - [SCOUTSUITE](https://github.com/nccgroup/ScoutSuite)  
+- Security Tool n°1 - [SCOUTSUITE](https://github.com/nccgroup/ScoutSuite)  
   - Scout Suite is an open source multi-cloud security-auditing tool, which enables security posture assessment of cloud environments. Using the APIs exposed by cloud providers, Scout Suite gathers configuration data for manual inspection and highlights risk areas. Rather than going through dozens of pages on the web consoles, Scout Suite presents a clear view of the attack surface automatically.
   - Scout Suite was designed by security consultants/auditors. It is meant to provide a point-in-time security-oriented view of the cloud account it was run in. Once the data has been gathered, all usage may be performed offline.
   ```
+  ----------------
   Install via Git
   ----------------
   $ git clone https://github.com/nccgroup/ScoutSuite
@@ -444,48 +434,462 @@ Key Capabilities (from AWS documentation):
   $ virtualenv -p python3 venv
   $ source venv/bin/activate
   $ pip install -r requirements.txt
-  
-  Run
-  ---
-  $ python scout.py --help
   ```
   ```
+  ----------------
   Install via PIP
   ----------------
   $ virtualenv -p python3 venv
   $ source venv/bin/activate
   $ pip install scoutsuite
   $ scout --help
+  ```
+  ```
+  --------------
+  Help (for AWS)
+  --------------
+  ┌──(venv)─(auditor㉿kali)-[~/Documents/Tools/Cloud-AWS/ScoutSuite]
+  └─$ python scout.py aws -help
+  usage: scout.py aws [-h] [-f] [-l] [--max-rate MAX_RATE] [--debug] [--quiet] [--logfile [LOG_FILE]] [--update] [--ruleset [RULESET]] [--no-browser] [--max-workers MAX_WORKERS] [--report-dir REPORT_DIR] [--report-name REPORT_NAME] [--timestamp [TIMESTAMP]] [--services SERVICES [SERVICES ...]] [--list-services] [--skip SKIPPED_SERVICES [SKIPPED_SERVICES ...]] [--exceptions [EXCEPTIONS]] [--result-format {json,sqlite}] [--serve [DATABASE_NAME]] [--host HOST_IP] [--port HOST_PORT] [-p PROFILE | --access-keys] [--access-key-id AWS_ACCESS_KEY_ID] [--secret-access-key AWS_SECRET_ACCESS_KEY] [--session-token AWS_SESSION_TOKEN] [-r REGIONS [REGIONS ...]] [-xr EXCLUDED_REGIONS [EXCLUDED_REGIONS ...]] [--ip-ranges IP_RANGES [IP_RANGES ...]] [--ip-ranges-name-key IP_RANGES_NAME_KEY]
   
-  Run
-  ---
-  $  python scout.py aws --profile basc -f
+  options:
+    -h, --help            show this help message and exit
+  
+  Scout Arguments:
+    -f, --force           Overwrite existing files
+    -l, --local           Use local data previously fetched and re-run the analysis.
+    --max-rate MAX_RATE   Maximum number of API requests per second
+    --debug               Print the stack trace when exception occurs
+    --quiet               Disables CLI output
+    --logfile [LOG_FILE]  Additional output to the specified file
+    --update              Reload all the existing data and only overwrite data in scope for this run
+    --ruleset [RULESET]   Set of rules to be used during the analysis.
+    --no-browser          Do not automatically open the report in the browser.
+    --max-workers MAX_WORKERS
+                          Maximum number of threads (workers) used by Scout Suite (default is 10)
+    --report-dir REPORT_DIR
+                          Path of the Scout report.
+    --report-name REPORT_NAME
+                          Name of the Scout report.
+    --timestamp [TIMESTAMP]
+                          Timestamp added to the name of the report (default is current time in UTC).
+    --services SERVICES [SERVICES ...]
+                          Name of in-scope services, defaults to all.
+    --list-services       List available services.
+    --skip SKIPPED_SERVICES [SKIPPED_SERVICES ...]
+                          Name of out-of-scope services.
+    --exceptions [EXCEPTIONS]
+                          Exception file to use during analysis.
+    --result-format {json,sqlite}
+                          [EXPERIMENTAL FEATURE] The database file format to use. JSON doesn't require a server to view the report, but cannot be viewed if the result file is over 400mb.
+    --serve [DATABASE_NAME]
+                          [EXPERIMENTAL FEATURE] Serve the specified result database on the server to show the report. This must be used when the results are exported as an sqlite database.
+    --host HOST_IP        [EXPERIMENTAL FEATURE] Address on which you want the server to listen. Defaults to localhost.
+    --port HOST_PORT      [EXPERIMENTAL FEATURE] Port on which you want the server to listen. Defaults to 8000.
+  
+  Authentication modes:
+    -p, --profile PROFILE
+                          Run with a named profile
+    --access-keys         Run with access keys
+  
+  Authentication parameters:
+    --access-key-id AWS_ACCESS_KEY_ID
+                          AWS Access Key ID
+    --secret-access-key AWS_SECRET_ACCESS_KEY
+                          AWS Secret Access Key
+    --session-token AWS_SESSION_TOKEN
+                          AWS Session Token
+  
+  Additional arguments:
+    -r, --regions REGIONS [REGIONS ...]
+                          Name of regions to run the tool in, defaults to all
+    -xr, --exclude-regions EXCLUDED_REGIONS [EXCLUDED_REGIONS ...]
+                          Name of regions to excluded from execution
+    --ip-ranges IP_RANGES [IP_RANGES ...]
+                          Config file(s) that contain your known IP ranges
+    --ip-ranges-name-key IP_RANGES_NAME_KEY
+
+  ```
+  ```
+  -------------------------------------
+   PoC / Test in my LAB AWS environment
+  -------------------------------------
+  
+  ┌──(venv)─(auditor㉿kali)-[~/Documents/Tools/Cloud-AWS/ScoutSuite]
+  └─$ python scout.py aws --access-keys --access-key-id AKIAXXXXXXXXXX --secret-access-key YYYYYYYYYYY --no-browser --report-dir . --report-name cloudsuite-scan-test 
+  2026-01-03 20:10:30 kali scout[2717] INFO Launching Scout
+  2026-01-03 20:10:30 kali scout[2717] INFO Authenticating to cloud provider
+  /home/kali/Documents/Tools/Cloud-AWS/ScoutSuite/ScoutSuite/providers/utils.py:137: SyntaxWarning: invalid escape sequence '\-'
+  <SNIP>
+  2026-01-03 20:10:33 kali scout[2717] INFO Gathering data from APIs
+  2026-01-03 20:10:33 kali scout[2717] INFO Fetching resources for the ACM service
+  2026-01-03 20:10:33 kali scout[2717] INFO Fetching resources for the Lambda service
+  2026-01-03 20:10:34 kali scout[2717] INFO Fetching resources for the CloudFormation service
+  2026-01-03 20:10:34 kali scout[2717] INFO Fetching resources for the CloudTrail service
+  2026-01-03 20:10:34 kali scout[2717] INFO Fetching resources for the CloudWatch service
+  2026-01-03 20:10:35 kali scout[2717] INFO Fetching resources for the CloudFront service
+  2026-01-03 20:10:35 kali scout[2717] INFO Fetching resources for the CodeBuild service
+  2026-01-03 20:10:36 kali scout[2717] INFO Fetching resources for the Config service
+  2026-01-03 20:10:36 kali scout[2717] INFO Fetching resources for the Direct Connect service
+  2026-01-03 20:10:37 kali scout[2717] INFO Fetching resources for the DynamoDB service
+  2026-01-03 20:10:37 kali scout[2717] INFO Fetching resources for the EC2 service
+  2026-01-03 20:10:38 kali scout[2717] INFO Fetching resources for the EFS service
+  2026-01-03 20:10:38 kali scout[2717] INFO Fetching resources for the ElastiCache service
+  2026-01-03 20:10:38 kali scout[2717] INFO Fetching resources for the ELB service
+  2026-01-03 20:10:39 kali scout[2717] INFO Fetching resources for the ELBv2 service
+  2026-01-03 20:10:39 kali scout[2717] INFO Fetching resources for the EMR service
+  2026-01-03 20:10:40 kali scout[2717] INFO Fetching resources for the IAM service
+  2026-01-03 20:10:40 kali scout[2717] INFO Fetching resources for the KMS service
+  2026-01-03 20:10:40 kali scout[2717] INFO Fetching resources for the RDS service
+  2026-01-03 20:10:41 kali scout[2717] INFO Fetching resources for the RedShift service
+  2026-01-03 20:10:41 kali scout[2717] INFO Fetching resources for the Route53 service
+  2026-01-03 20:10:41 kali scout[2717] INFO Fetching resources for the S3 service
+  2026-01-03 20:10:42 kali scout[2717] INFO Fetching resources for the SES service
+  2026-01-03 20:10:43 kali scout[2717] INFO Fetching resources for the SNS service
+  2026-01-03 20:10:43 kali scout[2717] INFO Fetching resources for the SQS service
+  2026-01-03 20:10:43 kali scout[2717] INFO Fetching resources for the VPC service
+  2026-01-03 20:10:44 kali scout[2717] INFO Fetching resources for the Secrets Manager service
+  2026-01-03 20:11:48 kali scout[2717] INFO Running pre-processing engine
+  2026-01-03 20:11:48 kali scout[2717] INFO Running rule engine
+  2026-01-03 20:11:51 kali scout[2717] INFO Applying display filters
+  2026-01-03 20:11:51 kali scout[2717] INFO Running post-processing engine
+  2026-01-03 20:11:51 kali scout[2717] INFO Saving data to ./scoutsuite-results/scoutsuite_results_cloudsuite-scan-test.js
+  2026-01-03 20:11:52 kali scout[2717] INFO Saving data to ./scoutsuite-results/scoutsuite_exceptions_cloudsuite-scan-test.js
+  2026-01-03 20:11:52 kali scout[2717] INFO Creating ./cloudsuite-scan-test.html
+  ```
+  ```
+  ----------------------
+   Example of findings 
+  ----------------------
   ```
 
-- Security Audit Tool n°3 - [PROWLER](https://github.com/prowler-cloud/prowler)  
+- Security Tool n°2 - [PROWLER](https://github.com/prowler-cloud/prowler)  
   - Prowler is an Open Cloud Security platform trusted by thousands to automate security and compliance in any cloud environment. With hundreds of ready-to-use checks and compliance frameworks, Prowler delivers real-time, customizable monitoring and seamless integrations, making cloud security simple, scalable, and cost-effective for organizations of any size.
   ```
+  --------------------------------------------------------------
   Install Prowler CLI - Pip package (with Python >3.9.1, <3.13)
   --------------------------------------------------------------
+  $ virtualenv -p python3 venv2
+  $ source venv2/bin/activate
   $ pip install prowler
-  
-  Run
-  ---
-  $ prowler -v
   ```
   ```
+  ---------------------------------------------------------------------------------------
   Install Prowler CLI from GitHub (Python >3.9.1, <3.13 is required with pip and Poetry)
   ---------------------------------------------------------------------------------------
   $ git clone https://github.com/prowler-cloud/prowler
   $ cd prowler
   $ eval $(poetry env activate)
   $ poetry install
+  ```
+  ```
+  --------------
+  Help (for AWS)
+  --------------
+
+  $ prowler aws -h
+  usage: prowler aws [-h] [-q] [-M {csv,json,json-asff,html,json-ocsf} [{csv,json,json-asff,html,json-ocsf} ...]] [-F [OUTPUT_FILENAME]] [-o [OUTPUT_DIRECTORY]] [--verbose] [-z] [-b] [--slack]
+                     [--unix-timestamp] [--log-level {DEBUG,INFO,WARNING,ERROR,CRITICAL}] [--log-file [LOG_FILE]] [--only-logs] [-c CHECKS [CHECKS ...]] [-C [CHECKS_FILE]] [-s SERVICES [SERVICES ...]]
+                     [--severity {informational,low,medium,high,critical} [{informational,low,medium,high,critical} ...]]
+                     [--compliance {aws_well_architected_framework_reliability_pillar_aws,cisa_aws,fedramp_low_revision_4_aws,pci_3.2.1_aws,gdpr_aws,aws_audit_manager_control_tower_guardrails_aws,nist_800_171_revision_2_aws,ffiec_aws,iso27001_2013_aws,gxp_21_cfr_part_11_aws,cis_1.5_aws,ens_rd2022_aws,aws_well_architected_framework_security_pillar_aws,nist_800_53_revision_4_aws,mitre_attack_aws,aws_foundational_security_best_practices_aws,gxp_eu_annex_11_aws,nist_csf_1.1_aws,rbi_cyber_security_framework_aws,nist_800_53_revision_5_aws,soc2_aws,hipaa_aws,cis_2.0_aws,cis_1.4_aws,fedramp_moderate_revision_4_aws,cis_2.0_gcp} [{aws_well_architected_framework_reliability_pillar_aws,cisa_aws,fedramp_low_revision_4_aws,pci_3.2.1_aws,gdpr_aws,aws_audit_manager_control_tower_guardrails_aws,nist_800_171_revision_2_aws,ffiec_aws,iso27001_2013_aws,gxp_21_cfr_part_11_aws,cis_1.5_aws,ens_rd2022_aws,aws_well_architected_framework_security_pillar_aws,nist_800_53_revision_4_aws,mitre_attack_aws,aws_foundational_security_best_practices_aws,gxp_eu_annex_11_aws,nist_csf_1.1_aws,rbi_cyber_security_framework_aws,nist_800_53_revision_5_aws,soc2_aws,hipaa_aws,cis_2.0_aws,cis_1.4_aws,fedramp_moderate_revision_4_aws,cis_2.0_gcp} ...]]
+                     [--categories CATEGORIES [CATEGORIES ...]] [-x [CHECKS_FOLDER]] [-e EXCLUDED_CHECKS [EXCLUDED_CHECKS ...]] [--excluded-services EXCLUDED_SERVICES [EXCLUDED_SERVICES ...]] [-l |
+                     --list-checks-json | --list-services | --list-compliance |
+                     --list-compliance-requirements {aws_well_architected_framework_reliability_pillar_aws,cisa_aws,fedramp_low_revision_4_aws,pci_3.2.1_aws,gdpr_aws,aws_audit_manager_control_tower_guardrails_aws,nist_800_171_revision_2_aws,ffiec_aws,iso27001_2013_aws,gxp_21_cfr_part_11_aws,cis_1.5_aws,ens_rd2022_aws,aws_well_architected_framework_security_pillar_aws,nist_800_53_revision_4_aws,mitre_attack_aws,aws_foundational_security_best_practices_aws,gxp_eu_annex_11_aws,nist_csf_1.1_aws,rbi_cyber_security_framework_aws,nist_800_53_revision_5_aws,soc2_aws,hipaa_aws,cis_2.0_aws,cis_1.4_aws,fedramp_moderate_revision_4_aws,cis_2.0_gcp} [{aws_well_architected_framework_reliability_pillar_aws,cisa_aws,fedramp_low_revision_4_aws,pci_3.2.1_aws,gdpr_aws,aws_audit_manager_control_tower_guardrails_aws,nist_800_171_revision_2_aws,ffiec_aws,iso27001_2013_aws,gxp_21_cfr_part_11_aws,cis_1.5_aws,ens_rd2022_aws,aws_well_architected_framework_security_pillar_aws,nist_800_53_revision_4_aws,mitre_attack_aws,aws_foundational_security_best_practices_aws,gxp_eu_annex_11_aws,nist_csf_1.1_aws,rbi_cyber_security_framework_aws,nist_800_53_revision_5_aws,soc2_aws,hipaa_aws,cis_2.0_aws,cis_1.4_aws,fedramp_moderate_revision_4_aws,cis_2.0_gcp} ...] |
+                     --list-categories] [--config-file [CONFIG_FILE]] [-p [PROFILE]] [-R [ROLE]] [--sts-endpoint-region [STS_ENDPOINT_REGION]] [--mfa] [-T [SESSION_DURATION]] [-I [EXTERNAL_ID]]
+                     [-f {il-central-1,ap-east-1,eu-west-2,ca-central-1,us-west-1,us-east-2,eu-south-1,ap-southeast-3,us-gov-west-1,ap-southeast-1,ap-south-2,eu-central-1,eu-south-2,eu-west-3,eu-central-2,me-central-1,me-south-1,ap-southeast-2,af-south-1,eu-north-1,sa-east-1,cn-northwest-1,ap-southeast-4,ap-northeast-1,ap-northeast-3,us-west-2,ap-northeast-2,ap-south-1,us-east-1,cn-north-1,us-gov-east-1,eu-west-1} [{il-central-1,ap-east-1,eu-west-2,ca-central-1,us-west-1,us-east-2,eu-south-1,ap-southeast-3,us-gov-west-1,ap-southeast-1,ap-south-2,eu-central-1,eu-south-2,eu-west-3,eu-central-2,me-central-1,me-south-1,ap-southeast-2,af-south-1,eu-north-1,sa-east-1,cn-northwest-1,ap-southeast-4,ap-northeast-1,ap-northeast-3,us-west-2,ap-northeast-2,ap-south-1,us-east-1,cn-north-1,us-gov-east-1,eu-west-1} ...]]
+                     [-O [ORGANIZATIONS_ROLE]] [-S] [--skip-sh-update] [-i] [-B [OUTPUT_BUCKET] | -D [OUTPUT_BUCKET_NO_ASSUME]] [-N [SHODAN]] [-w [ALLOWLIST_FILE]]
+                     [--resource-tags RESOURCE_TAGS [RESOURCE_TAGS ...] | --resource-arn RESOURCE_ARN [RESOURCE_ARN ...]] [--aws-retries-max-attempts [AWS_RETRIES_MAX_ATTEMPTS]] [--ignore-unused-services]
   
-  Run
-  ---
-  $ python prowler-cli.py -v
+  options:
+    -h, --help            show this help message and exit
+  
+  Outputs:
+    -q, --quiet           Store or send only Prowler failed findings
+    -M, --output-modes {csv,json,json-asff,html,json-ocsf} [{csv,json,json-asff,html,json-ocsf} ...]
+                          Output modes, by default csv, html and json
+    -F, --output-filename [OUTPUT_FILENAME]
+                          Custom output report name without the file extension, if not specified will use default output/prowler-output-ACCOUNT_NUM-OUTPUT_DATE.format
+    -o, --output-directory [OUTPUT_DIRECTORY]
+                          Custom output directory, by default the folder where Prowler is stored
+    --verbose             Display detailed information about findings
+    -z, --ignore-exit-code-3
+                          Failed checks do not trigger exit code 3
+    -b, --no-banner       Hide Prowler banner
+    --slack               Send a summary of the execution with a Slack APP in your channel. Environment variables SLACK_API_TOKEN and SLACK_CHANNEL_ID are required (see more in
+                          https://docs.prowler.cloud/en/latest/tutorials/integrations/#slack).
+    --unix-timestamp      Set the output timestamp format as unix timestamps instead of iso format timestamps (default mode).
+  
+  Logging:
+    --log-level {DEBUG,INFO,WARNING,ERROR,CRITICAL}
+                          Select Log Level
+    --log-file [LOG_FILE]
+                          Set log file name
+    --only-logs           Print only Prowler logs by the stdout. This option sets --no-banner.
+  
+  Specify checks/services to run:
+    -c, --checks CHECKS [CHECKS ...]
+                          List of checks to be executed.
+    -C, --checks-file [CHECKS_FILE]
+                          JSON file containing the checks to be executed. See config/checklist_example.json
+    -s, --services SERVICES [SERVICES ...]
+                          List of services to be executed.
+    --severity {informational,low,medium,high,critical} [{informational,low,medium,high,critical} ...]
+                          List of severities to be executed [informational, low, medium, high, critical]
+    --compliance {aws_well_architected_framework_reliability_pillar_aws,cisa_aws,fedramp_low_revision_4_aws,pci_3.2.1_aws,gdpr_aws,aws_audit_manager_control_tower_guardrails_aws,nist_800_171_revision_2_aws,ffiec_aws,iso27001_2013_aws,gxp_21_cfr_part_11_aws,cis_1.5_aws,ens_rd2022_aws,aws_well_architected_framework_security_pillar_aws,nist_800_53_revision_4_aws,mitre_attack_aws,aws_foundational_security_best_practices_aws,gxp_eu_annex_11_aws,nist_csf_1.1_aws,rbi_cyber_security_framework_aws,nist_800_53_revision_5_aws,soc2_aws,hipaa_aws,cis_2.0_aws,cis_1.4_aws,fedramp_moderate_revision_4_aws,cis_2.0_gcp} [{aws_well_architected_framework_reliability_pillar_aws,cisa_aws,fedramp_low_revision_4_aws,pci_3.2.1_aws,gdpr_aws,aws_audit_manager_control_tower_guardrails_aws,nist_800_171_revision_2_aws,ffiec_aws,iso27001_2013_aws,gxp_21_cfr_part_11_aws,cis_1.5_aws,ens_rd2022_aws,aws_well_architected_framework_security_pillar_aws,nist_800_53_revision_4_aws,mitre_attack_aws,aws_foundational_security_best_practices_aws,gxp_eu_annex_11_aws,nist_csf_1.1_aws,rbi_cyber_security_framework_aws,nist_800_53_revision_5_aws,soc2_aws,hipaa_aws,cis_2.0_aws,cis_1.4_aws,fedramp_moderate_revision_4_aws,cis_2.0_gcp} ...]
+                          Compliance Framework to check against for. The format should be the following: framework_version_provider (e.g.: ens_rd2022_aws)
+    --categories CATEGORIES [CATEGORIES ...]
+                          List of categories to be executed.
+    -x, --checks-folder [CHECKS_FOLDER]
+                          Specify external directory with custom checks (each check must have a folder with the required files, see more in https://docs.prowler.cloud/en/latest/tutorials/misc/#custom-checks).
+  
+  Exclude checks/services to run:
+    -e, --excluded-checks EXCLUDED_CHECKS [EXCLUDED_CHECKS ...]
+                          Checks to exclude
+    --excluded-services EXCLUDED_SERVICES [EXCLUDED_SERVICES ...]
+                          Services to exclude
+  
+  List checks/services/categories/compliance-framework checks:
+    -l, --list-checks     List checks
+    --list-checks-json    Output a list of checks in json for use with --checks-file
+    --list-services       List services
+    --list-compliance     List compliance frameworks
+    --list-compliance-requirements {aws_well_architected_framework_reliability_pillar_aws,cisa_aws,fedramp_low_revision_4_aws,pci_3.2.1_aws,gdpr_aws,aws_audit_manager_control_tower_guardrails_aws,nist_800_171_revision_2_aws,ffiec_aws,iso27001_2013_aws,gxp_21_cfr_part_11_aws,cis_1.5_aws,ens_rd2022_aws,aws_well_architected_framework_security_pillar_aws,nist_800_53_revision_4_aws,mitre_attack_aws,aws_foundational_security_best_practices_aws,gxp_eu_annex_11_aws,nist_csf_1.1_aws,rbi_cyber_security_framework_aws,nist_800_53_revision_5_aws,soc2_aws,hipaa_aws,cis_2.0_aws,cis_1.4_aws,fedramp_moderate_revision_4_aws,cis_2.0_gcp} [{aws_well_architected_framework_reliability_pillar_aws,cisa_aws,fedramp_low_revision_4_aws,pci_3.2.1_aws,gdpr_aws,aws_audit_manager_control_tower_guardrails_aws,nist_800_171_revision_2_aws,ffiec_aws,iso27001_2013_aws,gxp_21_cfr_part_11_aws,cis_1.5_aws,ens_rd2022_aws,aws_well_architected_framework_security_pillar_aws,nist_800_53_revision_4_aws,mitre_attack_aws,aws_foundational_security_best_practices_aws,gxp_eu_annex_11_aws,nist_csf_1.1_aws,rbi_cyber_security_framework_aws,nist_800_53_revision_5_aws,soc2_aws,hipaa_aws,cis_2.0_aws,cis_1.4_aws,fedramp_moderate_revision_4_aws,cis_2.0_gcp} ...]
+                          List compliance requirements for a given compliance framework
+    --list-categories     List the available check's categories
+  
+  Configuration:
+    --config-file [CONFIG_FILE]
+                          Set configuration file path
+  
+  Authentication Modes:
+    -p, --profile [PROFILE]
+                          AWS profile to launch prowler with
+    -R, --role [ROLE]     ARN of the role to be assumed
+    --sts-endpoint-region [STS_ENDPOINT_REGION]
+                          Specify the AWS STS endpoint region to use. Read more at https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_enable-regions.html
+    --mfa                 IAM entity enforces MFA so you need to input the MFA ARN and the TOTP
+    -T, --session-duration [SESSION_DURATION]
+                          Assumed role session duration in seconds, must be between 900 and 43200. Default: 3600
+    -I, --external-id [EXTERNAL_ID]
+                          External ID to be passed when assuming role
+  
+  AWS Regions:
+    -f, --region, --filter-region {il-central-1,ap-east-1,eu-west-2,ca-central-1,us-west-1,us-east-2,eu-south-1,ap-southeast-3,us-gov-west-1,ap-southeast-1,ap-south-2,eu-central-1,eu-south-2,eu-west-3,eu-central-2,me-central-1,me-south-1,ap-southeast-2,af-south-1,eu-north-1,sa-east-1,cn-northwest-1,ap-southeast-4,ap-northeast-1,ap-northeast-3,us-west-2,ap-northeast-2,ap-south-1,us-east-1,cn-north-1,us-gov-east-1,eu-west-1} [{il-central-1,ap-east-1,eu-west-2,ca-central-1,us-west-1,us-east-2,eu-south-1,ap-southeast-3,us-gov-west-1,ap-southeast-1,ap-south-2,eu-central-1,eu-south-2,eu-west-3,eu-central-2,me-central-1,me-south-1,ap-southeast-2,af-south-1,eu-north-1,sa-east-1,cn-northwest-1,ap-southeast-4,ap-northeast-1,ap-northeast-3,us-west-2,ap-northeast-2,ap-south-1,us-east-1,cn-north-1,us-gov-east-1,eu-west-1} ...]
+                          AWS region names to run Prowler against
+  
+  AWS Organizations:
+    -O, --organizations-role [ORGANIZATIONS_ROLE]
+                          Specify AWS Organizations management role ARN to be assumed, to get Organization metadata
+  
+  AWS Security Hub:
+    -S, --security-hub    Send check output to AWS Security Hub
+    --skip-sh-update      Skip updating previous findings of Prowler in Security Hub
+  
+  Quick Inventory:
+    -i, --quick-inventory
+                          Run Prowler Quick Inventory. The inventory will be stored in an output csv by default
+  
+  AWS Outputs to S3:
+    -B, --output-bucket [OUTPUT_BUCKET]
+                          Custom output bucket, requires -M <mode> and it can work also with -o flag.
+    -D, --output-bucket-no-assume [OUTPUT_BUCKET_NO_ASSUME]
+                          Same as -B but do not use the assumed role credentials to put objects to the bucket, instead uses the initial credentials.
+  
+  3rd Party Integrations:
+    -N, --shodan [SHODAN]
+                          Shodan API key used by check ec2_elastic_ip_shodan.
+  
+  Allowlist:
+    -w, --allowlist-file [ALLOWLIST_FILE]
+                          Path for allowlist yaml file. See example prowler/config/aws_allowlist.yaml for reference and format. It also accepts AWS DynamoDB Table or Lambda ARNs or S3 URIs, see more in
+                          https://docs.prowler.cloud/en/latest/tutorials/allowlist/
+  
+  AWS Based Scans:
+    --resource-tags RESOURCE_TAGS [RESOURCE_TAGS ...]
+                          Scan only resources with specific AWS Tags (Key=Value), e.g., Environment=dev Project=prowler
+    --resource-arn RESOURCE_ARN [RESOURCE_ARN ...]
+                          Scan only resources with specific AWS Resource ARNs, e.g., arn:aws:iam::012345678910:user/test arn:aws:ec2:us-east-1:123456789012:vpc/vpc-12345678
+  
+  Boto3 Config:
+    --aws-retries-max-attempts [AWS_RETRIES_MAX_ATTEMPTS]
+                          Set the maximum attemps for the Boto3 standard retrier config (Default: 3)
+  
+  Ignore Unused Services:
+    --ignore-unused-services
+                          Ignore findings in unused services
+  ```
+  ```
+  -------------------------------------
+   PoC / Test in my LAB AWS environment
+  -------------------------------------
+  
+  ┌──(venv2)─(kali㉿kali)-[~/Documents/Tools/Prowler]
+  └─$ AWS_ACCESS_KEY_ID=AKIAXXXXXXXXXX \
+  AWS_SECRET_ACCESS_KEY=YYYYYYYYYYYYYY \
+  prowler aws -o reports/ -M json html csv                
+                           _
+   _ __  _ __ _____      _| | ___ _ __
+  | '_ \| '__/ _ \ \ /\ / / |/ _ \ '__|
+  | |_) | | | (_) \ V  V /| |  __/ |
+  | .__/|_|  \___/ \_/\_/ |_|\___|_|v3.11.3
+  |_| the handy cloud security tool
+  
+  Date: 2026-01-03 22:56:19
+  
+  
+  This report is being generated using credentials below:
+  
+  AWS-CLI Profile: [default] AWS Filter Region: [all]
+  AWS Account: [489XXXXXXXX UserId: [AKIAXXXXXXXXXX]
+  Caller Identity ARN: [arn:aws:iam::48XXXXXXXXXX:user/Auditor]
+  
+  Executing 301 checks, please wait...
+  
+  Something went wrong in iam_avoid_root_usage, please use --log-level ERROR
+  Something went wrong in iam_rotate_access_key_90_days, please use --log-level ERROR
+  Something went wrong in iam_user_accesskey_unused, please use --log-level ERROR
+  -> Scan completed! |▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉| 301/301 [100%] in 2:50.4 
+  
+  Overview Results:
+  ╭─────────────────────┬─────────────────────╮
+  │ 48.78% (421) Failed │ 50.75% (438) Passed │
+  ╰─────────────────────┴─────────────────────╯
+  
+  Account 4899XXXXXX Scan Results (severity columns are for fails only):
+  ╭────────────┬───────────────────┬───────────┬────────────┬────────┬──────────┬───────╮
+  │ Provider   │ Service           │ Status    │   Critical │   High │   Medium │   Low │
+  ├────────────┼───────────────────┼───────────┼────────────┼────────┼──────────┼───────┤
+  │ aws        │ accessanalyzer    │ FAIL (17) │          0 │      0 │        0 │    17 │
+  ├────────────┼───────────────────┼───────────┼────────────┼────────┼──────────┼───────┤
+  │ aws        │ account           │ FAIL (1)  │          0 │      0 │        1 │     0 │
+  ├────────────┼───────────────────┼───────────┼────────────┼────────┼──────────┼───────┤
+  │ aws        │ athena            │ FAIL (34) │          0 │      0 │       34 │     0 │
+  ├────────────┼───────────────────┼───────────┼────────────┼────────┼──────────┼───────┤
+  │ aws        │ backup            │ FAIL (1)  │          0 │      0 │        0 │     1 │
+  ├────────────┼───────────────────┼───────────┼────────────┼────────┼──────────┼───────┤
+  │ aws        │ cloudtrail        │ FAIL (20) │          0 │     17 │        0 │     3 │
+  ├────────────┼───────────────────┼───────────┼────────────┼────────┼──────────┼───────┤
+  │ aws        │ cloudwatch        │ FAIL (15) │          0 │      0 │       15 │     0 │
+  ├────────────┼───────────────────┼───────────┼────────────┼────────┼──────────┼───────┤
+  │ aws        │ config            │ FAIL (17) │          0 │      0 │       17 │     0 │
+  ├────────────┼───────────────────┼───────────┼────────────┼────────┼──────────┼───────┤
+  │ aws        │ ec2               │ FAIL (95) │          0 │     19 │       74 │     2 │
+  ├────────────┼───────────────────┼───────────┼────────────┼────────┼──────────┼───────┤
+  │ aws        │ emr               │ PASS (17) │          0 │      0 │        0 │     0 │
+  ├────────────┼───────────────────┼───────────┼────────────┼────────┼──────────┼───────┤
+  │ aws        │ glue              │ FAIL (34) │          0 │      0 │       34 │     0 │
+  ├────────────┼───────────────────┼───────────┼────────────┼────────┼──────────┼───────┤
+  │ aws        │ guardduty         │ FAIL (17) │          0 │      0 │       17 │     0 │
+  ├────────────┼───────────────────┼───────────┼────────────┼────────┼──────────┼───────┤
+  │ aws        │ iam               │ FAIL (22) │          1 │      3 │        9 │     9 │
+  ├────────────┼───────────────────┼───────────┼────────────┼────────┼──────────┼───────┤
+  │ aws        │ inspector2        │ FAIL (17) │          0 │      0 │       17 │     0 │
+  ├────────────┼───────────────────┼───────────┼────────────┼────────┼──────────┼───────┤
+  │ aws        │ network-firewall  │ FAIL (17) │          0 │      0 │       17 │     0 │
+  ├────────────┼───────────────────┼───────────┼────────────┼────────┼──────────┼───────┤
+  │ aws        │ organizations     │ FAIL (3)  │          0 │      0 │        2 │     1 │
+  ├────────────┼───────────────────┼───────────┼────────────┼────────┼──────────┼───────┤
+  │ aws        │ resourceexplorer2 │ FAIL (1)  │          0 │      0 │        0 │     1 │
+  ├────────────┼───────────────────┼───────────┼────────────┼────────┼──────────┼───────┤
+  │ aws        │ s3                │ FAIL (1)  │          0 │      1 │        0 │     0 │
+  ├────────────┼───────────────────┼───────────┼────────────┼────────┼──────────┼───────┤
+  │ aws        │ securityhub       │ FAIL (17) │          0 │      0 │       17 │     0 │
+  ├────────────┼───────────────────┼───────────┼────────────┼────────┼──────────┼───────┤
+  │ aws        │ ssm               │ FAIL (1)  │          0 │      0 │        0 │     1 │
+  ├────────────┼───────────────────┼───────────┼────────────┼────────┼──────────┼───────┤
+  │ aws        │ trustedadvisor    │ PASS (1)  │          0 │      0 │        0 │     0 │
+  ├────────────┼───────────────────┼───────────┼────────────┼────────┼──────────┼───────┤
+  │ aws        │ support           │ FAIL (1)  │          0 │      0 │        0 │     1 │
+  ├────────────┼───────────────────┼───────────┼────────────┼────────┼──────────┼───────┤
+  │ aws        │ vpc               │ FAIL (90) │          0 │      0 │       90 │     0 │
+  ╰────────────┴───────────────────┴───────────┴────────────┴────────┴──────────┴───────╯
+  * You only see here those services that contains resources.
+  
+  Detailed results are in:
+   - HTML: reports//prowler-output-489XXXXXXXX-20260103225619.html
+   - CSV: reports//prowler-output-489XXXXXXXX-20260103225619.csv
+   - JSON: reports//prowler-output-489XXXXXXXX-20260103225619.json
+                                                                  
   ```
 
+- Securitycret Tool n°1 - [CLOUDSPLOIT](https://github.com/aquasecurity/cloudsploit) 
+  - It is an open-source project designed to allow detection of security risks in cloud infrastructure accounts, including: Amazon Web Services (AWS), Microsoft Azure, Google Cloud Platform (GCP), Oracle Cloud Infrastructure (OCI), and GitHub. These scripts are designed to return a series of potential misconfigurations and security risks.
+  ```
+  -------------
+  Using Docker
+  -------------
+  $ git clone https://github.com/aquasecurity/cloudsploit.git
+  $ cd cloudsploit
+  $ docker build . -t cloudsploit:0.0.1 
+
+  ┌──(auditor㉿kali)-[~/…/Tools/Cloud-AWS/CloudSploit/cloudsploit]
+  └─$ docker run cloudsploit:0.0.1                          
+  
+     _____ _                 _  _____       _       _ _   
+    / ____| |               | |/ ____|     | |     (_) |  
+   | |    | | ___  _   _  __| | (___  _ __ | | ___  _| |_ 
+   | |    | |/ _ \| | | |/ _` |\___ \| '_ \| |/ _ \| | __|
+   | |____| | (_) | |_| | (_| |____) | |_) | | (_) | | |_ 
+    \_____|_|\___/ \__,_|\__,_|_____/| .__/|_|\___/|_|\__|
+                                     | |                  
+                                     |_|                  
+  
+    CloudSploit by Aqua Security, Ltd.
+    Cloud security auditing for AWS, Azure, GCP, Oracle, and GitHub
+  
+  usage: cloudsploit-scan [-h] [--config CONFIG]
+                          [--compliance {hipaa,cis,cis1,cis2,pci}]
+                          [--plugin PLUGIN] [--govcloud] [--china] [--csv CSV]
+                          [--json JSON] [--junit JUNIT]
+                          [--console {none,text,table}]
+                          [--collection COLLECTION] [--ignore-ok] [--exit-code]
+                          [--skip-paginate] [--suppress SUPPRESS]
+                          [--remediate REMEDIATE]
+                          [--cloud {aws,azure,github,google,oracle,alibaba}]
+                          [--run-asl]
+  
+  optional arguments:
+    -h, --help            show this help message and exit
+    --config CONFIG       The path to a CloudSploit config file containing cloud
+                          credentials. See config_example.js. If not provided,
+                          logic will use default AWS credential chain and will
+                          also override provided cloud
+    --compliance {hipaa,cis,cis1,cis2,pci}
+                          Compliance mode. Only return results applicable to the
+                          selected program.
+    --plugin PLUGIN       A specific plugin to run. If none provided, all
+                          plugins will be run. Obtain from the exports.js file.
+                          E.g. acmValidation
+    --govcloud            AWS only. Enables GovCloud mode.
+    --china               AWS only. Enables AWS China mode.
+    --csv CSV             Output: CSV file
+    --json JSON           Output: JSON file
+    --junit JUNIT         Output: Junit file
+    --console {none,text,table}
+                          Console output format. Default: table
+    --collection COLLECTION
+                          Output: full collection JSON as file
+    --ignore-ok           Ignore passing (OK) results
+    --exit-code           Exits with a non-zero status code if non-passing
+                          results are found
+    --skip-paginate       AWS only. Skips pagination (for debugging).
+    --suppress SUPPRESS   Suppress results matching the provided Regex. Format:
+                          pluginId:region:resourceId
+    --remediate REMEDIATE
+                          Run remediation the provided plugin
+    --cloud {aws,azure,github,google,oracle,alibaba}
+                          The name of cloud to run plugins for. If not provided,
+                          logic will assume cloud from config.js file based on
+                          provided credentials
+    --run-asl             When set, it will execute custom plugins.
+   ``` 
+  ```
+  ------------------
+  Example of command
+  ------------------
+  $ docker run --rm -e AWS_ACCESS_KEY_ID=XXXXX -e AWS_SECRET_ACCESS_KEY=YYYYYYY cloudsploit:0.0.1 --cloud aws 
+  ```
+  
 #### B. Check for known privesc attack vectors in AWS
   
 - Usefull ressources:
