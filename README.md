@@ -1,5 +1,5 @@
 ## AWS Cloud Security Assessment
-Technical notes, audit & pentest methodology, list of tools, scripts and commands that are useful for assessing the security posture of an AWS Cloud environment.<br>
+Technical notes, list of tools, scripts and commands that are useful for assessing the security posture of an AWS Cloud environment (audit & pentest).
 
 ### Table of contents 
 - I. AWS Cloud Essentials - Reminder
