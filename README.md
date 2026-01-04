@@ -607,9 +607,9 @@ Key Capabilities (from AWS documentation):
   2026-01-03 20:11:52 kali scout[2717] INFO Creating ./cloudsuite-scan-test.html
   ```
   ```
-  -------------------------------------------------------------------------------------
-  Basic example of checks and findings that we can find in the report for IAM/EC2/VPC
-  -------------------------------------------------------------------------------------
+  -------------------------------------------------------------------------------------------------------------
+  Illustrative examples of checks and issues identified in my vulnerable AWS testing LAB for IAM, EC2, and VPC
+  -------------------------------------------------------------------------------------------------------------
   
   ----- IAM service -----
   
