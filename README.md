@@ -33,13 +33,14 @@ Technical notes, audit & pentest methodology, list of tools, scripts and command
 
 ### I. AWS Cloud Essentials - Reminder
 
-#### 1.1. Introduction
+#### 1.1. INTRODUCTION
 
 - AWS provides cloud computing i.e. on-demand delivery of technology services through the Internet with pay-as-you-go pricing.
 The AWS Cloud encompasses a broad set of global cloud-based products that includes compute, storage, databases, analytics, networking, mobile, developer tools, management tools, IoT, security, and enterprise applications: on-demand, available in seconds, with pay-as-you-go pricing.
 
 - AWS delivers cloud capabilities through the three service models: Software as a Service (SaaS), Platform as a Service (PaaS), and Infrastructure as a Service (IaaS). 
 These models differ in how much control the customer retains versus how much AWS manages. Understanding these layers helps teams choose the right level of abstraction for their applications, operations, and security responsibilities.
+
 
 #### 1.2. Main AWS services across IaaS, PaaS, and SaaS
 
