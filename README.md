@@ -6,7 +6,7 @@ Technical notes, list of tools, scripts and commands that are useful for assessi
   - [1.1. Introduction](#11-INTRODUCTION)
   - [1.2. Main AWS services across IaaS, PaaS, and SaaS](#12-main-aws-services-across-iaas-paas-and-saas)
   - [1.3. AWS security best practices](#13-AWS-Security-Best-Practices)
-  - [1.4. Key differences between IAM User, Role, and Group](#14-Key-Differences-Between-IAM-User-Role-and-Group)
+  - [1.4. Key Differences Between the AWS Root User, IAM Users, Roles, and Groups]([#14-key-differences-between-root-user-iam-user-role-and-group)
   - [1.5. Cloud‑Native Application Protection Platforms (CNAPP)](#15-cloudnative-application-protection-platforms-cnapp)
   - [1.6. How to use the AWS CLI](#16-How-to-use-the-AWS-CLI)
   - [1.7. List of usefull AWS CLI commands](#17-List-of-usefull-AWS-CLI-commands)
@@ -19,12 +19,13 @@ Technical notes, list of tools, scripts and commands that are useful for assessi
     - Prowler
     - CloudSploit
     - Cloudsplaining
-  - [2.2. Check for known privesc attack vectors in AWS (mostly IAM service)](#22-check-for-known-privesc-attack-vectors-in-aws)
+  - [2.2. Check for known privesc attack vectors in AWS (IAM, Lambda, Glue, CodeStar)](#22-check-for-known-privesc-attack-vectors-in-aws)
 
 - III. AWS Penetration Testing
   - [3.1. AWS customer support and service policy for penetration testing](#31-aws-customer-support-and-service-policy-for-penetration-testing)
   - [3.2. AWS pentest methodology - Usefull ressources](#32-aws-pentest-methodology---usefull-ressources)
-  - [3.1. List of AWS penetration testing tools](#33-list-of-aws-pentest-tools)
+  - [3.3. List of AWS penetration testing tools](#33-list-of-aws-pentest-tools)
+  - [3.4. List of AWS pentesting and security CTFs](#34-list-of-aws-cloud-pentesting-and-securty-ctfs)
 
 ----------------
 
@@ -152,14 +153,24 @@ Balancer access logging, to gain visibility into events. Configure logs to flow 
   - 3. Practice responding to events.
     - Simulate and practice incident response by running regular game days, incorporating the lessons learned into your incident management plans, and continuously improving them.
 
-#### 1.4. KEY DIFFERENCES BETWEEN IAM USER, ROLE, AND GROUP
+#### 1.4. KEY DIFFERENCES BETWEEN ROOT USER, IAM USER, ROLE, AND GROUP
 
-  - IAM Users
+  - Root User
+    - Root user = account owner with unlimited power (i.e., it has full, irreversible access to every AWS resource and billing setting).
+    - Created automatically when the AWS account is created.
+    - Uses the email and password of the AWS account owner.
+    - Cannot be restricted by IAM policies.
+    - Should be used only for specific tasks such as: changing the AWS account settings, closing the AWS account, restoring MFA, managing certain billing features.
+    - Security Best Practices: enable MFA on the root account immediately, create an admin IAM user for administrative tasks and DO NOT use the root account (lock away the root credentials and use them only when required).
+
+  - IAM User
     - User = A long‑term identity with permanent credentials (password, access keys).
     - Users authenticate directly, while roles require AssumeRole to obtain temporary credentials.
     - Users are for humans or applications, roles are for delegation and cross‑account access, and groups are for permission management.
+    - Can be part of groups, roles, and policies.
+    - Used for everyday operations such as: Managing EC2, S3, RDS, Lambda, ..., deploying applications, admin tasks (if granted)
 
-  - IAM Roles
+  - IAM Role
     - Role = An identity that provides temporary credentials and must be assumed via STS; it has no password or access keys of its own.
     - Roles are commonly used by AWS services (EC2, Lambda, etc.) to access other AWS resources securely.
 
@@ -1061,7 +1072,9 @@ Key Capabilities (from AWS documentation):
   - https://rhinosecuritylabs.com/aws/aws-privilege-escalation-methods-mitigation/
   - https://bishopfox.com/blog/5-privesc-attack-vectors-in-aws
   - https://bishopfox.com/blog/privilege-escalation-in-aws
-  
+
+##### 2.2.1 Privilege escalation - Abusing IAM permissions
+
 - IAM Permissions on Other Users  
   - The following user account and group permissions can all be used to escalate privileges:
       + <i/> iam:CreateAccessKey </i>
@@ -1073,7 +1086,7 @@ Key Capabilities (from AWS documentation):
       + A user creating a new API key for a more privileged user account
       + A user updating the account password for a more privileged user account
      
-- Permissions on Policies
+- IAM Permissions on Policies
   - The following policy permissions can lead to privilege escalation:
       + <i/> iam:CreatePolicyVersion </i>
       + <i/> iam:SetDefaultPolicyVersion </i>
@@ -1092,18 +1105,35 @@ Key Capabilities (from AWS documentation):
   - Wildcard permissions in IAM policies
       + If a user or role has permissions like 'sts:AssumeRole' with wildcards, they may be able to assume roles that grant more privileges than intended.
 
-- Updating an AssumeRolePolicy
+- IAM - Updating an AssumeRolePolicy
   - The 'iam:UpdateAssumeRolePolicy' permission provides an entity with the ability to change a role’s AssumeRolePolicy. So, if a user is not included in this policy but they have the ability to update it, they can just add their user account to the AssumeRolePolicy and consequently assume the role. Depending on the permissions associated with the role, this could provide a path for privilege escalation.
    
-- 'iam:PassRole:*'
+- IAM - 'iam:PassRole:*'
   - The 'iam:PassRole' permission allows a user to pass a role to an AWS entity. Passing roles is a crucial element in AWS permissions and resource management. For instance, when deploying an application to AWS, the application may need to perform certain actions on the back end, such as accessing databases or running Lambda functions. In order to allow the application to access these AWS services, you pass a role to it that contains the necessary permissions.
   - Problems with the 'iam:PassRole' permission occur when there is no defined role or set of roles that the principal is allowed to pass. For instance, policies that allow the use of iam:PassRole on wildcard resources (iam:PassRole:*). In effect, this allows the user to pass any role that exists in the environment, including any existing privileged roles. This may open up the possibility for a user to pass a privileged role to an AWS resource or service, and then use that resource or service to perform privileged actions.
 
-- Privilege Escalation Using AWS Services
-  - It’s possible in some cases to escalate privileges using an AWS service. Lambda and Glue are two services that may allow users to execute commands that they should not be able to execute, and CloudFormation and Data Pipeline may be used for privesc as well if the user also has the iam:PassRole permission.
-  - For Lambda, just having the permission to modify functions can lead to privilege escalation because a user can update a Lambda function to perform privileged actions on their behalf. The risk here depends on the permissions with which the Lambda function operates.
-  - Similarly, the permission to modify a Glue development endpoint can lead to privilege escalation because a user might, for example, change the SSH key associated with an endpoint so they can then log into the system and use it to perform privileged actions. Again, the risk depends on the permissions assigned to the endpoint.
-   
+##### 2.2.2 Privilege escalation - Abusing LAMBDA permissions
+
+- LAMBDA - 'lambda:UpdateFunctionCode' and 'lambda:UpdateFunctionConfiguration'
+  - With access to the 'lambda:UpdateFunctionCode' permission, an adversary can modify an existing Lambda function's code. This would allow them to gain access to the privileges of the associated IAM role the next time the function is executed. The risk here depends on the permissions with which the Lambda function operates.
+
+- LAMBDA - 'lambda:UpdateFunctionConfiguration'
+  - With access to the lambda:UpdateFunctionConfiguration permission, an adversary can modify an existing Lambda function's configuration to add a new Lambda Layer. This Layer would then override an existing library and allow an adversary to execute malicious code under the privilege of the role associated with the Lambda function.
+
+##### 2.2.3 Privilege escalation - Abusing GLUE permissions
+
+- GLUE - 'glue:UpdateDevEndpoint' and 'glue:GetDevEndpoint'
+  - The permission to modify a Glue development endpoint (glue:UpdateDevEndpoint) can lead to privilege escalation because a user might, for example, change the SSH key associated with an endpoint so they can then log into the system and use it to perform privileged actions (i.e, gain access to IAM credentials associated with the role attached to the glue endpoint). Again, the risk depends on the permissions assigned to the endpoint.
+    - Though not required, it may be helpful to have the glue:GetDevEndpoint permission as well, if the existing endpoint cannot be identified via other means.
+
+##### 2.2.4 Privilege escalation - Abusing CODESTAR permissions
+
+- CODESTAR - 'codestar:CreateProject' and 'codestar:AssociateTeamMember'
+  - With access to the 'codestar:CreateProject' and 'codestar:AssociateTeamMember' permissions, an adversary can create a new CodeStar project and associate themselves as an Owner of the project. This will attach a new policy to the user that provides access to a number of permissions for AWS services. This is most useful for further enumeration as it gives access to 'lambda:List*', 'iam:ListRoles', 'iam:ListUsers', and more.
+
+##### 2.2.5 Privilege escalation - Abusing CloudFormation permissions
+
+- CloudFormation and Data Pipeline may be used for privesc if the user has the 'iam:PassRole' permission.
 
 ----------------
 
@@ -1158,36 +1188,33 @@ Link - https://aws.amazon.com/pt/security/penetration-testing/
  
 
 #### 3.3. LIST OF AWS PENTEST TOOLS
-  
-  - PACU - The AWS exploitation framework, designed for testing the security of Amazon Web Services environments.
-    - https://github.com/RhinoSecurityLabs/pacu
-      
-  - Cloud_enum - Multi-cloud OSINT tool. Enumerate public resources in AWS, Azure, and Google Cloud.
-    - https://github.com/initstring/cloud_enum
-      
-  - CloudFox - Automating situational awareness for cloud penetration tests.
-    - https://github.com/BishopFox/CloudFox/
 
-  - S3Scanner - Scan for misconfigured S3 buckets across S3-compatible APIs.
-    - https://github.com/sa7mon/S3Scanner
-  
-  - S3_objects_check - Whitebox evaluation of effective S3 object permissions, to identify publicly accessible files.
-    - https://github.com/nccgroup/s3_objects_check
-      
-  - Enumerate-IAM - Enumerate the permissions associated with AWS credential set.
-    - https://github.com/andresriancho/enumerate-iam
-      
-  - IAMActionHunter - An AWS IAM policy statement parser and query tool.
-    - https://github.com/RhinoSecurityLabs/IAMActionHunter
-      
-  - AWS IAM Privilege Escalation Methods
-    - https://github.com/RhinoSecurityLabs/AWS-IAM-Privilege-Escalation
-      
-  - Orca-Security - Iam-ape - APE takes all of your AWS IAM policies attached to a User, Group, or Role object, and presents you with a single policy, summarizing all of their actual permissions. Taking into account permissions, denials, inherited permissions and permission boundaries!
-    - https://github.com/orcasecurity/orca-toolbox/tree/main/iam-ape
-    
-  - Stratus Red Team - It is "Atomic Red Team™" for the cloud, allowing to emulate offensive attack techniques in a granular and self-contained manner.
-    - https://github.com/DataDog/stratus-red-team
 
-  - ...
+| Tools | Description |
+| --- | --- |
+| [PACU](https://github.com/RhinoSecurityLabs/pacu) | The AWS exploitation framework, designed for testing the security of Amazon Web Services environments. |
+| [Cloud_enum](https://github.com/initstring/cloud_enum) | Multi-cloud OSINT tool. Enumerate public resources in AWS, Azure, and Google Cloud. |
+| [CloudFox](https://github.com/BishopFox/CloudFox/) | Automating situational awareness for cloud penetration tests. |
+| [S3Scanner](https://github.com/sa7mon/S3Scanner) | Scan for misconfigured S3 buckets across S3-compatible APIs. |
+| [S3_objects_check](https://github.com/nccgroup/s3_objects_check) | Whitebox evaluation of effective S3 object permissions, to identify publicly accessible files.|
+| [CloudPEASS](https://github.com/peass-ng/CloudPEASS) | Multi-Cloud Privilege Escalation Awesome Script Suite - AWSPEAS is your ultimate tool for enumerating AWS permissions and uncovering potential privilege escalation paths and other attack vectors—all while leaving your target environment unchanged. It leverages multiple techniques to gather, simulate, and even infer permissions, giving you deep insights into the security posture of your AWS setup.Whitebox evaluation of effective S3 object permissions, to identify publicly accessible files.|
+| [Enumerate-IAM](https://github.com/andresriancho/enumerate-iam) | Enumerate the permissions associated with AWS credential set. |
+| [IAMActionHunter](https://github.com/RhinoSecurityLabs/IAMActionHunter) | An AWS IAM policy statement parser and query tool. |
+| [AWS IAM Privilege Escalation](https://github.com/RhinoSecurityLabs/AWS-IAM-Privilege-Escalation) | AWS IAM Privilege Escalation Methods |
+| [Orca-Security - Iam-ape](https://github.com/orcasecurity/orca-toolbox/tree/main/iam-ape) | APE takes all of your AWS IAM policies attached to a User, Group, or Role object, and presents you with a single policy, summarizing all of their actual permissions. Taking into account permissions, denials, inherited permissions and permission boundaries! |
+| [Stratus Red Team](https://github.com/DataDog/stratus-red-team) | It is "Atomic Red Team™" for the cloud, allowing to emulate offensive attack techniques in a granular and self-contained manner. |
+
+
+#### 3.4. LIST OF AWS CLOUD PENTESTING AND SECURTY CTFS
+
+ | LAB or CTF | Description |
+| --- | --- |
+| [FLAWS CTF](http://flaws.cloud) | This challenge comprises a series of 6 levels designed to teach some common security mistakes made when using Amazon Web Services (AWS) |
+| [FLAWS 2 CTF](http://flaws2.cloud) | This challenge has two paths : Attacker and Defender! In the Attacker path, you’ll exploit your way through misconfigurations in serverless (Lambda) and containers (ECS Fargate). In the Defender path, that target is now viewed as the victim and you’ll work as an incident responder for that same app, understanding how an attack happened. You’ll get access to logs of a previous successful attack. As a Defender you’ll learn the power of jq in analyzing logs, and instructions on how to set up Athena in your own environment. |
+| [AWSGoat](https://github.com/ine-labs/AWSGoat) | AWSGoat : A Damn Vulnerable AWS Infrastructure |
+| [Big IAM Challenge by Wiz](https://bigiamchallenge.com/challenge/1)  | Test Your Cloud Security Skills |
+| [iam-vulnerable](https://github.com/BishopFox/iam-vulnerable) | Use Terraform to create your own vulnerable by design AWS IAM privilege escalation playground |
+| [cloudhuntinggames](https://www.cloudhuntinggames.com) | The Cloud Hunting Games CTF: Test Your Cloud IR Skills |
+| [cloudbreachsim](https://cloudbreachsim.senayakut.com/) | Your interactive cloud security simulation environment. Select a scenario to visualize attack paths, understand vulnerabilities, and learn how to defend your infrastructure. |
+
    
