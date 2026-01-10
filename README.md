@@ -6,7 +6,7 @@ Technical notes, list of tools, scripts and commands that are useful for assessi
   - [1.1. Introduction](#11-INTRODUCTION)
   - [1.2. Main AWS services across IaaS, PaaS, and SaaS](#12-main-aws-services-across-iaas-paas-and-saas)
   - [1.3. AWS security best practices](#13-AWS-Security-Best-Practices)
-  - [1.4. Key Differences Between the AWS Root User, IAM Users, Roles, and Groups]([#14-key-differences-between-root-user-iam-user-role-and-group)
+  - [1.4. Key differences between the AWS Root User, IAM Users, Roles, and Groups](#14-key-differences-between-root-user-iam-user-role-and-group)
   - [1.5. Cloud‑Native Application Protection Platforms (CNAPP)](#15-cloudnative-application-protection-platforms-cnapp)
   - [1.6. How to use the AWS CLI](#16-How-to-use-the-AWS-CLI)
   - [1.7. List of usefull AWS CLI commands](#17-List-of-usefull-AWS-CLI-commands)
