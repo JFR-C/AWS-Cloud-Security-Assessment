@@ -14,12 +14,10 @@ Technical notes, list of tools, scripts and commands that are useful for assessi
   - [1.9. Basic tutorial to create a Kali Linux EC2 VM on AWS](#19-Basic-tutorial-to-create-a-Kali-Linux-EC2-VM-on-AWS)
 
 - II. AWS Security Audit
-  - [2.1. Run AWS security scans using audit tools to identify potential misconfigurations](#21-run-aws-security-scans-using-audit-tools-to-identify-potential-security-misconfigurations)
-    - CloudSuite
-    - Prowler
-    - CloudSploit
-    - Cloudsplaining
-  - [2.2. Check for known privesc attack vectors in AWS (IAM, Lambda, Glue, CodeStar)](#22-check-for-known-privesc-attack-vectors-in-aws)
+  - [2.1. AWS security assessment checklist (governance and techncial levels)](#21-aws-security-assessment-checklist-goveranace-and-technical-levels)
+  - [2.2. Assess the security configuration of an AWS account using audit tools](#22-assess-the-security-configuration-of-an-aws-account-using-audit-tools)
+    - CloudSuite / Prowler / CloudSploit / Cloudsplaining
+  - [2.2. Check for known privesc attack vectors in AWS (IAM, Lambda, Glue, CodeStar)](#23-check-for-known-privesc-attack-vectors-in-aws)
 
 - III. AWS Penetration Testing
   - [3.1. AWS customer support and service policy for penetration testing](#31-aws-customer-support-and-service-policy-for-penetration-testing)
@@ -94,73 +92,77 @@ These models differ in how much control the customer retains versus how much AWS
 #### 1.3. AWS SECURITY BEST PRACTICES
 
 - Identity & Access Management
-  - 1. Secure your AWS account.
+  - Secure your AWS account.
     - Use AWS Organizations to manage your accounts, use the root user by exception with multi-factor authentication (MFA) enabled, and configure account contacts.
-  - 2. Rely on centralized identity provider.
+  - Rely on centralized identity provider.
     - Centralize identities using either AWS Single Sign-On or a third-party provider to avoid routinely creating IAM users or using long-term access keys—this approach makes it easier to manage multiple AWS accounts and federated applications.
-  - 3. Use multiple AWS accounts to separate workloads and workload stages such as production and non-production.
+  - Use multiple AWS accounts to separate workloads and workload stages such as production and non-production.
     - Multiple AWS accounts allow you to separate data and resources, and enable the use of Service Control Policies to implement guardrails. AWS Control Tower can help you easily set up and govern a multi-account AWS environment.
-  - 4. Store and use secrets securely.
+  - Store and use secrets securely.
     - Where you cannot use temporary credentials, like tokens from AWS Security Token Service, store your secrets like database passwords using AWS Secrets Manager which handles encryption, rotation, and access control.
 
 - Role Management
-  - 1. Apply least‑privilege permissions and use IAM roles instead of long‑lived IAM users  
+  - Apply least‑privilege permissions and use IAM roles instead of long‑lived IAM users  
     - Grant only the minimum permissions required for each role and rely on temporary credentials through IAM roles to eliminate static access keys.
-  - 2. Enforce strong separation of duties with role‑based access control (RBAC)  
+  - Enforce strong separation of duties with role‑based access control (RBAC)  
     - Create distinct roles for administration, deployment, monitoring, and automation so no single role has excessive or overlapping privileges.
-  - 3. Use IAM Access Analyzer and IAM policy validation to detect overly permissive roles  
+  - Use IAM Access Analyzer and IAM policy validation to detect overly permissive roles  
     - Continuously analyze trust policies and permissions to identify roles that allow unintended external access or wildcard permissions.
-  - 4. Enable role session tagging and logging for traceability and accountability  
+  - Enable role session tagging and logging for traceability and accountability  
     - Use CloudTrail and session tags to track who assumed which role, when, and for what purpose, strengthening auditability and incident response.
-  - 5. Manage the usage and risks of assumed roles by restricting who can assume them and monitoring cross‑account trust relationships
+  - Manage the usage and risks of assumed roles by restricting who can assume them and monitoring cross‑account trust relationships
     - Overly broad trust policies or permissive 'sts:AssumeRole' permissions can allow unintended access paths, privilege escalation, or unauthorized lateral movement across accounts. Regularly review trust policies, enforce MFA‑protected role assumption, and monitor CloudTrail for unusual or high‑risk role‑assumption patterns.
 
 - Infrastructure Protection
-  - 1. Patch your operating system, applications, and code.
+  - Patch your operating system, applications, and code.
     - Use AWS Systems Manager Patch Manager to automate the patching process of all systems and code for which you are responsible, including your OS, applications, and code dependencies.
-  - 2. Implement distributed denial-of-service (DDoS) protection for your internet facing resources.
+  - Harden your EC2 instances
+    - Apply CIS Level 1/2 hardening controls and automate CIS compliance checks with AWS Config or Inspector
+    - Prefer AWS Systems Manager Session Manager for shell access.
+    - Enforce IMDSv2 to protect against SSRF attacks that try to steal instance credentials.
+    - Never store secrets on hosts (use AWS Secrets Manager or SSM parameter store)
+  - Harden your Infrastructure as Code (IaC)
+    - Enforce secure defaults by using Terraform or CloudFormation modules that require IMDSv2, disable public IPs, enforce encrypted volumes.
+    - Scan IaC using tools like Checkov, tfsec, CloudFormation Guard, OPA Gatekeeper.
+  - Implement distributed denial-of-service (DDoS) protection for your internet facing resources.
     - Use Amazon Cloudfront, AWS WAF and AWS Shield to provide layer 7 and layer 3/layer 4 DDoS protection.
-  - 3. Control access using VPC Security Groups and subnet layers.
-    - Use security groups for controlling inbound and outbound traffic, and automatically apply rules for both security groups and WAFs using AWS Firewall Manager. Group different resources into different subnets to create routing layers, for example database resources do not need a route to the internet.
-
-- Network Security
-  - 1. Enforce least‑privilege network access using Security Groups and NACLs  
+  - Implement multi‑layered perimeter protection with AWS WAF, Shield, and Network Firewall  
+    - Use WAF to filter malicious HTTP/S traffic, and Network Firewall for deep packet inspection and centralized rule enforcement across VPCs.
+  - Enforce least‑privilege network access using Security Groups and NACLs  
     - Design inbound and outbound rules so that only required ports, protocols, and sources are allowed, and segment workloads into separate security groups to minimize lateral movement.
     - Security Groups are stateful virtual firewalls that control inbound and outbound traffic at the instance or ENI level, enforcing least‑privilege access to workloads.
     - Network ACLs (NACLs) are stateless subnet‑level firewalls that provide an additional layer of network filtering, allowing or denying traffic before it reaches resources.
-  - 2. Eliminate public exposure by using private subnets, VPC Endpoints, and AWS PrivateLink  
+  - Eliminate public exposure by using private subnets, VPC Endpoints, and AWS PrivateLink  
     - Keep databases, internal services, and sensitive workloads off the public internet, and route traffic to AWS services privately to reduce attack surface.
     - VPC (Virtual Private Cloud) is a logically isolated section of the AWS Cloud where you define your own IP ranges, subnets, routing, and network boundaries, forming the foundation of AWS network security.
     - PrivateLink & VPC Endpoints allow to securely connect to AWS services or third‑party SaaS without exposing traffic to the public internet, reducing attack surface.
-  - 3. Implement multi‑layered perimeter protection with AWS WAF, Shield, and Network Firewall  
-    - Use WAF to filter malicious HTTP/S traffic, Shield to mitigate DDoS attacks, and Network Firewall for deep packet inspection and centralized rule enforcement across VPCs.
-  - 4. Continuously monitor and analyze network activity with VPC Flow Logs and GuardDuty  
+  - Continuously monitor and analyze network activity with VPC Flow Logs and GuardDuty  
     - Capture flow logs for visibility into traffic patterns and anomalies, and rely on GuardDuty to detect suspicious behavior such as port scanning, unusual API calls, or compromised instances.
     - Amazon GuardDuty is a threat detection service that analyzes VPC Flow Logs, DNS logs, and CloudTrail events to identify suspicious or malicious activity in your network.
 
 - Data Protection
-  - 1. Protect data at rest.
+  - Protect data at rest.
     - Use AWS Key Management Service (KMS) to protect data at rest across a wide range of AWS services and your applications. Enable default encryption for Amazon EBS volumes, and Amazon S3 buckets.
-  - 2. Encrypt data in transit.
+  - Encrypt data in transit.
     - Enable encryption for all network traffic, including Transport Layer Security (TLS) for web based network infrastructure you control using AWS Certificate Manager to manage and provision certificates.
-  - 3. Use mechanisms to keep people away from data.
+  - Use mechanisms to keep people away from data.
     - Keep all users away from directly accessing sensitive data and systems. For example, provide an Amazon QuickSight dashboard to business users instead of direct access to a database, and perform actions at a distance using AWS Systems Manager automation documents and Run Command.
 
 - Incident Detection
-  - 1. Enable foundational services: AWS CloudTrail, Amazon GuardDuty, and AWS Security Hub.
+  - Enable foundational services: AWS CloudTrail, Amazon GuardDuty, and AWS Security Hub.
     - For all your AWS accounts configure CloudTrail to log API activity, use GuardDuty for continuous monitoring, and use AWS Security Hub for a comprehensive view of your security posture.
-  - 2. Configure service and application level logging.
+  - Configure service and application level logging.
     - In addition to your application logs, enable logging at the service level, such as Amazon VPC Flow Logs and Amazon S3, CloudTrail, and Elastic Load
 Balancer access logging, to gain visibility into events. Configure logs to flow to a central account, and protect them from manipulation or deletion.
-  - 3. Configure monitoring and alerts, and investigate events.
+  - Configure monitoring and alerts, and investigate events.
     - Enable AWS Config to track the history of resources, and Config Managed Rules to automatically alert or remediate on undesired changes. For all your sources of logs and events, from AWS CloudTrail, to Amazon GuardDuty and your application logs, configure alerts for high priority events and investigate.
    
 - Incident Response
-  - 1. Ensure you have an incident response (IR) plan.
+  - Ensure you have an incident response (IR) plan.
     - Begin your IR plan by building runbooks to respond to unexpected events in your workload. For details, see the AWS Security Incident Response Guide.
-  - 2. Make sure that someone is notified to take action on critical findings.
+  - Make sure that someone is notified to take action on critical findings.
     - Begin with GuardDuty findings. Turn on GuardDuty and ensure that someone with the ability to take action receives the notifications. Automatically creating trouble tickets is the best way to ensure that GuardDuty findings are integrated with your operational processes.
-  - 3. Practice responding to events.
+  - Practice responding to events.
     - Simulate and practice incident response by running regular game days, incorporating the lessons learned into your incident management plans, and continuously improving them.
 
 #### 1.4. KEY DIFFERENCES BETWEEN ROOT USER, IAM USER, ROLE, AND GROUP
@@ -474,7 +476,164 @@ Key Capabilities (from AWS documentation):
 
 ### II. AWS SECURITY AUDIT
 
-#### 2.1. RUN AWS SECURITY SCANS USING AUDIT TOOLS TO IDENTIFY POTENTIAL SECURITY MISCONFIGURATIONS
+
+#### 2.1. AWS SECURITY ASSESSMENT CHECKLIST (GOVERANACE AND TECHNICAL LEVELS)
+
+A comprehensive checklist for evaluating the security posture of an AWS account across governance, identity, infrastructure, data protection, monitoring, and operations.
+
+
+  ##### 2.1.1. Governance & Account Management
+
+    ##### AWS Organizations & Account Structure
+    [] Multi-account strategy implemented (prod, dev, shared services, security, logging)
+    [] Service Control Policies (SCPs) applied to enforce guardrails
+    [] Root accounts secured with MFA and no access keys
+    [] Contact information updated for all accounts
+  
+    ##### Policies & Governance
+    [] Cloud security policy documented and approved
+    [] Shared Responsibility Model understood and applied
+    [] CAIQ/CCM governance controls reviewed
+    [] Change management process defined for cloud resources
+  
+  ##### 2.1.2. Identity & Access Management (IAM)
+
+    ##### IAM Users & Roles
+    [] IAM users minimized; roles preferred
+    [] MFA enforced for all human users
+    [] No long-lived access keys unless justified
+    [] IAM roles used for applications and services
+    
+    ##### Permissions & Policies
+    [] Least privilege enforced (no `*:*` policies)
+    [] Permission boundaries used for delegated admin
+    [] IAM Access Analyzer shows no unintended access
+    [] Role trust policies restricted (no wildcard principals)
+    
+    ##### Credential Management
+    [] Access keys rotated regularly
+    [] Password policy meets security standards
+    [] SSO or Identity Center used for workforce access
+
+  ##### 2.1.3. Network & Infrastructure Security
+
+    ##### VPC Architecture
+    [] VPCs segmented by environment and sensitivity
+    [] Private subnets used for internal workloads
+    [] NAT gateways used instead of public IPs
+    [] VPC endpoints used for AWS service access
+  
+    ##### Network Controls
+    [] Security Groups follow least privilege
+    [] No Security Groups allow `0.0.0.0/0` unless justified
+    [] NACLs configured appropriately
+    [] Route tables reviewed for unintended exposure
+  
+    ##### Perimeter Protection
+    [] AWS WAF enabled for public applications
+    [] AWS Shield Advanced enabled for critical workloads
+    [] ALB/NLB listeners use TLS 1.2+
+
+  ##### 2.1.4. Compute & Host Hardening
+
+    ##### EC2 Instances
+    [] IMDSv2 enforced
+    [] No public EC2 instances unless required
+    [] SSM Session Manager used instead of SSH
+    [] Patch Manager configured for OS updates
+    [] EBS volumes encrypted by default
+    
+    ##### Containers & Kubernetes
+    [] ECR image scanning enabled
+    [] EKS clusters use IRSA for pod IAM roles
+    [] RBAC configured with least privilege
+    [] Network Policies enforced
+    [] Fargate used where possible for isolation
+    
+    ##### Serverless
+    [] Lambda functions use least-privilege IAM roles
+    [] Environment variables do not contain secrets
+    [] Function timeouts and concurrency limits set
+
+  ##### 2.1.5. Data Protection & Storage Security
+
+    ##### S3 Security
+    [] Block Public Access enabled at account level
+    [] No public buckets unless explicitly required
+    [] Bucket policies reviewed for external access
+    [] Default encryption enabled (KMS CMKs for sensitive data)
+    
+    ##### Database & Storage
+    [] RDS encryption enabled
+    [] RDS backups and retention configured
+    [] DynamoDB PITR enabled
+    [] EBS encryption enforced
+    
+    ##### Secrets & Keys
+    [] Secrets stored in Secrets Manager or Parameter Store
+    [] KMS CMKs used for sensitive workloads
+    [] Key rotation enabled where applicable
+
+  ##### 2.1.6. Logging, Monitoring & Threat Detection
+
+    ##### Logging
+    [] CloudTrail enabled in all regions
+    [] CloudTrail logs centralized in a dedicated account
+    [] VPC Flow Logs enabled for all VPCs
+    [] S3 access logs enabled for critical buckets
+    
+    ##### Monitoring
+    [] CloudWatch alarms configured for critical events
+    [] Application logs centralized
+    [] Metric filters for security events (e.g., root login)
+    
+    ##### Threat Detection
+    [] GuardDuty enabled in all regions
+    [] Security Hub enabled with AWS Foundational Best Practices
+    [] Inspector scanning EC2/ECR/EKS
+    [] Access Analyzer enabled
+
+  ##### 2.1.7. Compliance & Continuous Assurance
+
+    ##### AWS Config
+    [] AWS Config enabled in all regions
+    [] Required rules deployed (CIS, NIST, custom)
+    [] Conformance Packs applied where needed
+    
+    ##### CI/CD Security
+    [] IaC scanning (Checkov, tfsec, CFN Guard)
+    [] Secrets scanning in pipelines
+    [] Artifact signing and image provenance enforced
+
+  ##### 2.1.8. Backup, DR & Incident Response
+
+    ##### Backup & Recovery
+    [] AWS Backup configured for all critical workloads
+    [] Cross-region backups enabled
+    [] Backup immutability enabled (Vault Lock)
+    [] Restore tests performed regularly
+  
+    ##### Incident Response
+    [] IR playbooks for AWS documented
+    [] Forensics procedures defined (snapshot, log preservation)
+    [] GuardDuty findings triage process defined
+    [] Access revocation process documented
+
+##### 2.1.9. Security Maturity Scoring (Optional)
+
+  | Domain | Score (1–5) | Notes |
+  |--------|-------------|-------|
+  | Governance |  |  |
+  | IAM |  |  |
+  | Network |  |  |
+  | Compute |  |  |
+  | Data Protection |  |  |
+  | Monitoring |  |  |
+  | Compliance |  |  |
+  | IR & DR |  |  |
+
+
+#### 2.2. ASSESS THE SECURITY CONFIGURATION OF AN AWS ACCOUNT USING AUDIT TOOLS
 
 - Use audit tools and scripts to evaluate the security posture of an AWS cloud environment and identify potential misconfigurations across key services such as IAM, EC2, S3, Lambda, VPC, CloudTrail, etc.
 - Minimum Roles & Privileges for AWS Security Audit Tools (General Guidance)
@@ -1056,26 +1215,26 @@ Key Capabilities (from AWS documentation):
   ```
   ```
   ------------------------------------------------------
-  Example of command -  Scanning an entire AWS Account
+  Example of commands -  Scanning an entire AWS Account
   ------------------------------------------------------
   - You must have AWS credentials configured that can be used by the CLI.
   - You must have the privileges to run iam:GetAccountAuthorizationDetails.
     The arn:aws:iam::aws:policy/SecurityAudit policy includes this, as do many others that allow Read access to the IAM Service.
 
-  Step 1. Downloading Account Authorization Details
+  Step 1. Downloading account authorization Details
   $ cloudsplaining download                      #If you use environment variables 
   $ cloudsplaining download --profile myprofile  #With a profile (~/.aws/credentials)
 
-  Step 2. Create Exclusions file
+  Step 2. Create exclusions file
   cloudsplaining create-exclusions-file          #Follow instructions from the Github project 
   
-  Step 3. Scanning the Authorization Details file
+  Step 3. Scanning the authorization details file
   $ cloudsplaining scan --exclusions-file exclusions.yml --input-file examples/files/example.json --output examples/files/
   -> It will create an HTML report and a JSON report.
   ```
 
   
-#### 2.2. CHECK FOR KNOWN PRIVESC ATTACK VECTORS IN AWS
+#### 2.3. CHECK FOR KNOWN PRIVESC ATTACK VECTORS IN AWS
   
 - Usefull ressources:
   - https://github.com/RhinoSecurityLabs/AWS-IAM-Privilege-Escalation
