@@ -43,42 +43,52 @@ These models differ in how much control the customer retains versus how much AWS
 #### 1.2. MAIN AWS SERVICES ACROSS IAAS, PaaS, AND SaaS
 
 - AWS Cloud - Infrastructure as a Service (IaaS) - These services give raw compute, storage, and networking building blocks.
-  - Amazon EC2 — Provides resizable virtual servers in the cloud with full OS‑level control.
-  - Amazon S3 — Offers highly durable, scalable object storage for any type of data.
-  - Amazon EBS — Delivers block‑level storage volumes for EC2 instances.
-  - Amazon VPC — Lets you create isolated virtual networks with full control over routing and security.
-  - Elastic Load Balancing (ELB) — Automatically distributes incoming traffic across multiple compute resources.
-  - Amazon Route 53 — A scalable DNS and domain management service.
-  - AWS IAM — Provides identity and access control for AWS resources.
-  - Amazon EFS — A fully managed, scalable file storage system for Linux workloads.
-  - AWS Direct Connect — Establishes dedicated network connections between your data center and AWS.
-  - ...
+
+  | Service | Description |
+  | --- | --- |
+  | Amazon EC2 | Provides resizable virtual servers in the cloud with full OS‑level control. |
+  | Amazon S3 | Offers highly durable, scalable object storage for any type of data. |
+  | Amazon EBS | Delivers block‑level storage volumes for EC2 instances. |
+  | Amazon VPC | Lets you create isolated virtual networks with full control over routing and security. |
+  | Elastic Load Balancing (ELB) | Automatically distributes incoming traffic across multiple compute resources. |
+  | Amazon Route 53 | A scalable DNS and domain management service. |
+  | AWS IAM | Provides identity and access control for AWS resources. |
+  | Amazon EFS | A fully managed, scalable file storage system for Linux workloads. |
+  | AWS Direct Connect | Establishes dedicated network connections between your data center and AWS. |
+  | ... | ... |
+
 
 - AWS Cloud - Platform as a Service (PaaS) - These services abstract away infrastructure so user can focus on code and applications.
-  - AWS Lambda — Runs your code without provisioning or managing servers.
-  - AWS Elastic Beanstalk — Automatically deploys and manages applications using preconfigured environments.
-  - Amazon RDS — Provides managed relational databases with automated backups and patching.
-  - Amazon Aurora — A high‑performance, fully managed relational database compatible with MySQL and PostgreSQL.
-  - AWS Fargate — Runs containers without managing servers or clusters.
-  - Amazon API Gateway — Creates, manages, and secures APIs at scale.
-  - Amazon DynamoDB — A fully managed NoSQL database with single‑digit millisecond performance.
-  - Amazon SQS — A managed message queuing service for decoupling distributed systems.
-  - Amazon SNS — A pub/sub messaging service for event notifications.
-  - AWS CloudTrail — Records API activity and governance events across your AWS environment.
-  - AWS Control Tower (Cloud Foundation) — Provides automated landing zone setup and governance for multi‑account AWS environments.
-  - AWS Secrets Manager - It securely stores and manages sensitive credentials, providing controlled access and automated rotation to keep your applications and cloud environment safer.
-  - ...
+
+  | Service | Description |
+  | --- | --- |
+  | AWS Lambda | Runs your code without provisioning or managing servers (serverless). |
+  | AWS Elastic Beanstalk | Automatically deploys and manages applications using preconfigured environments. |
+  | Amazon RDS  | Provides managed relational databases with automated backups and patching. |
+  | Amazon Aurora | A high‑performance, fully managed relational database compatible with MySQL and PostgreSQL. |
+  | AWS Fargate | Runs containers without managing servers or clusters. |
+  | Amazon API Gateway | Creates, manages, and secures APIs at scale. |
+  | Amazon DynamoDB | A fully managed NoSQL database with single‑digit millisecond performance. |
+  | Amazon SQS | A managed message queuing service for decoupling distributed systems.|
+  | Amazon SNS | A pub/sub messaging service for event notifications. |
+  | AWS CloudTrail | Records API activity and governance events across your AWS environment. |
+  | AWS Control Tower (Cloud Foundation) | Provides automated landing zone setup and governance for multi‑account AWS environments. |
+  | AWS Secrets Manager | It securely stores and manages sensitive credentials, providing controlled access and automated rotation to keep your applications and cloud environment safer. |
+  | ... | ... |
 
 - AWS Cloud - Software as a Service (SaaS) - These are fully managed applications delivered directly to end users.
-  - Amazon Chime — A cloud‑based communications service for meetings, chat, and video conferencing.
-  - Amazon QuickSight — A fully managed business intelligence service for dashboards and analytics.
-  - Amazon WorkMail — A secure, managed business email and calendaring service.
-  - Amazon WorkDocs — A cloud‑based document storage and collaboration platform.
-  - AWS Managed Services (AMS) — Provides ongoing operations management for enterprise AWS environments.
-  - AWS IoT Device Management — A fully managed service for onboarding and managing IoT devices at scale.
-  - Amazon Connect — A cloud‑based contact center platform for customer service operations.
-  - Amazon GuardDuty — A fully managed threat detection service that continuously monitors for malicious activity.
-  - ...
+
+  | Service | Description |
+  | --- | --- |
+  | Amazon Chime | A cloud‑based communications service for meetings, chat, and video conferencing. |
+  | Amazon QuickSight | A fully managed business intelligence service for dashboards and analytics. |
+  | Amazon WorkMail | A secure, managed business email and calendaring service. |
+  | Amazon WorkDocs | A cloud‑based document storage and collaboration platform. |
+  | AWS Managed Services (AMS) | Provides ongoing operations management for enterprise AWS environments. |
+  | AWS IoT Device Management | A fully managed service for onboarding and managing IoT devices at scale. |
+  | Amazon Connect | A cloud‑based contact center platform for customer service operations. |
+  | Amazon GuardDuty | A fully managed threat detection service that continuously monitors for malicious activity. |
+  | ... | ... |
 
 
 #### 1.3. AWS SECURITY BEST PRACTICES
@@ -1207,7 +1217,7 @@ Link - https://aws.amazon.com/pt/security/penetration-testing/
 
 #### 3.4. LIST OF AWS CLOUD PENTESTING AND SECURTY CTFS
 
- | LAB or CTF | Description |
+| LAB or CTF | Description |
 | --- | --- |
 | [FLAWS CTF](http://flaws.cloud) | This challenge comprises a series of 6 levels designed to teach some common security mistakes made when using Amazon Web Services (AWS) |
 | [FLAWS 2 CTF](http://flaws2.cloud) | This challenge has two paths : Attacker and Defender! In the Attacker path, you’ll exploit your way through misconfigurations in serverless (Lambda) and containers (ECS Fargate). In the Defender path, that target is now viewed as the victim and you’ll work as an incident responder for that same app, understanding how an attack happened. You’ll get access to logs of a previous successful attack. As a Defender you’ll learn the power of jq in analyzing logs, and instructions on how to set up Athena in your own environment. |
