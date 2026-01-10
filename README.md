@@ -14,7 +14,7 @@ Technical notes, list of tools, scripts and commands that are useful for assessi
   - [1.9. Basic tutorial to create a Kali Linux EC2 VM on AWS](#19-Basic-tutorial-to-create-a-Kali-Linux-EC2-VM-on-AWS)
 
 - II. AWS Security Audit
-  - [2.1. AWS security assessment checklist (governance and techncial levels)](#21-aws-security-assessment-checklist-governance-and-technical-levels)
+  - [2.1. AWS security assessment checklist (governance and technical levels)](#21-aws-security-assessment-checklist-governance-and-technical-levels)
   - [2.2. Assess the security configuration of an AWS account using audit tools](#22-assess-the-security-configuration-of-an-aws-account-using-audit-tools)
     - CloudSuite / Prowler / CloudSploit / Cloudsplaining
   - [2.3. Check for known privesc attack vectors in AWS (IAM, Lambda, Glue, CodeStar)](#23-check-for-known-privesc-attack-vectors-in-aws)
