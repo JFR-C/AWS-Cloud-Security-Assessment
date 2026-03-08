@@ -1243,7 +1243,7 @@ A comprehensive checklist for evaluating the security posture of an AWS account 
   - https://bishopfox.com/blog/5-privesc-attack-vectors-in-aws
   - https://bishopfox.com/blog/privilege-escalation-in-aws
 
-##### 2.3.1 Discover privilege escalation paths across 10+ AWS services with the tool 'Heimdall'
+#### 2.3.1 Discover privilege escalation paths across 10+ AWS services with the tool 'Heimdall'
 
 - [HEIMDALL](https://github.com/DenizParlak/heimdall) 
   - Heimdall is an AWS security scanner that discovers privilege escalation paths attackers could exploit to gain admin access.
@@ -1532,7 +1532,7 @@ A comprehensive checklist for evaluating the security posture of an AWS account 
     <SNIP>
     ```
     
-##### 2.3.2 Examples of known privesc attack vectors in AWS (IAM, Lambda, Glue, CodeStar)
+#### 2.3.2 Examples of known privesc attack vectors in AWS (IAM, Lambda, Glue, CodeStar)
 
 ###### Privilege escalation - Abusing IAM permissions
 
