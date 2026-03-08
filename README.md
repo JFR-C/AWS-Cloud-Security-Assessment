@@ -1132,7 +1132,7 @@ A comprehensive checklist for evaluating the security posture of an AWS account 
   - AWS Attack Path Scanner:
     - 50+ IAM privilege escalation patterns detected
     - 85+ attack chain patterns with MITRE ATT&CK mapping
-    - 10 AWS services analyzed for cross-service escalation
+    - 10 AWS services analyzed for cross-service escalation (EC2, RDS, S3, Lambda, KMS, Secrets Manager, STS, SNS, SQS, DynamoDB)
     - Low false-positive rate - tested on production accounts with 50+ roles
     - One command to assess your entire security posture
     ```
