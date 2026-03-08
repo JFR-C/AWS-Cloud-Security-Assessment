@@ -16,12 +16,10 @@ Technical notes, list of tools, scripts and commands that are useful for assessi
 - II. AWS Security Audit
   - [2.1. AWS security assessment checklist (governance and technical levels)](#21-aws-security-assessment-checklist-governance-and-technical-levels)
   - [2.2. Assess the security configuration of an AWS account using audit tools](#22-assess-the-security-configuration-of-an-aws-account-using-audit-tools)
-    - CloudSuite
-    - Prowler
-    - Heimdall
-    - CloudSploit
-    - Cloudsplaining
-  - [2.3. Check for known privesc attack vectors in AWS (IAM, Lambda, Glue, CodeStar)](#23-check-for-known-privesc-attack-vectors-in-aws)
+    - Tools: CloudSuite, Prowler, CloudSploit, Cloudsplaining
+  - [2.3. Check for known privesc attack vectors in AWS](#23-check-for-known-privesc-attack-vectors-in-aws)
+    - Discover privilege escalation paths across 10+ AWS services with the tool 'Heimdall'
+    - Examples of known privesc attack vectors in AWS (IAM, Lambda, Glue, CodeStar)
 
 - III. AWS Penetration Testing
   - [3.1. AWS customer support and service policy for penetration testing](#31-aws-customer-support-and-service-policy-for-penetration-testing)
@@ -1127,7 +1125,127 @@ A comprehensive checklist for evaluating the security posture of an AWS account 
                                                                     
     ```
 
-- AUDIT TOOL N°3 - [HEIMDALL](https://github.com/DenizParlak/heimdall) 
+- AUDIT TOOL N°3 - [CLOUDSPLOIT](https://github.com/aquasecurity/cloudsploit) 
+  - It is an open-source project designed to allow detection of security risks in cloud infrastructure accounts, including: Amazon Web Services (AWS), Microsoft Azure, Google Cloud Platform (GCP), Oracle Cloud Infrastructure (OCI), and GitHub. These scripts are designed to return a series of potential misconfigurations and security risks.
+    ```
+    -------------
+    Using Docker
+    -------------
+    $ git clone https://github.com/aquasecurity/cloudsploit.git
+    $ cd cloudsploit
+    $ docker build . -t cloudsploit:0.0.1 
+  
+    ┌──(auditor㉿kali)-[~/…/Tools/Cloud-AWS/CloudSploit/cloudsploit]
+    └─$ docker run cloudsploit:0.0.1                          
+    
+       _____ _                 _  _____       _       _ _   
+      / ____| |               | |/ ____|     | |     (_) |  
+     | |    | | ___  _   _  __| | (___  _ __ | | ___  _| |_ 
+     | |    | |/ _ \| | | |/ _` |\___ \| '_ \| |/ _ \| | __|
+     | |____| | (_) | |_| | (_| |____) | |_) | | (_) | | |_ 
+      \_____|_|\___/ \__,_|\__,_|_____/| .__/|_|\___/|_|\__|
+                                       | |                  
+                                       |_|                  
+    
+      CloudSploit by Aqua Security, Ltd.
+      Cloud security auditing for AWS, Azure, GCP, Oracle, and GitHub
+    
+    usage: cloudsploit-scan [-h] [--config CONFIG]
+                            [--compliance {hipaa,cis,cis1,cis2,pci}]
+                            [--plugin PLUGIN] [--govcloud] [--china] [--csv CSV]
+                            [--json JSON] [--junit JUNIT]
+                            [--console {none,text,table}]
+                            [--collection COLLECTION] [--ignore-ok] [--exit-code]
+                            [--skip-paginate] [--suppress SUPPRESS]
+                            [--remediate REMEDIATE]
+                            [--cloud {aws,azure,github,google,oracle,alibaba}]
+                            [--run-asl]
+    
+    optional arguments:
+      -h, --help            show this help message and exit
+      --config CONFIG       The path to a CloudSploit config file containing cloud
+                            credentials. See config_example.js. If not provided,
+                            logic will use default AWS credential chain and will
+                            also override provided cloud
+      --compliance {hipaa,cis,cis1,cis2,pci}
+                            Compliance mode. Only return results applicable to the
+                            selected program.
+      --plugin PLUGIN       A specific plugin to run. If none provided, all
+                            plugins will be run. Obtain from the exports.js file.
+                            E.g. acmValidation
+      --govcloud            AWS only. Enables GovCloud mode.
+      --china               AWS only. Enables AWS China mode.
+      --csv CSV             Output: CSV file
+      --json JSON           Output: JSON file
+      --junit JUNIT         Output: Junit file
+      --console {none,text,table}
+                            Console output format. Default: table
+      --collection COLLECTION
+                            Output: full collection JSON as file
+      --ignore-ok           Ignore passing (OK) results
+      --exit-code           Exits with a non-zero status code if non-passing
+                            results are found
+      --skip-paginate       AWS only. Skips pagination (for debugging).
+      --suppress SUPPRESS   Suppress results matching the provided Regex. Format:
+                            pluginId:region:resourceId
+      --remediate REMEDIATE
+                            Run remediation the provided plugin
+      --cloud {aws,azure,github,google,oracle,alibaba}
+                            The name of cloud to run plugins for. If not provided,
+                            logic will assume cloud from config.js file based on
+                            provided credentials
+      --run-asl             When set, it will execute custom plugins.
+    ```
+    ```
+    ------------------
+    Example of command
+    ------------------
+    $ docker run --rm -e AWS_ACCESS_KEY_ID=XXXXX -e AWS_SECRET_ACCESS_KEY=YYYYYYY cloudsploit:0.0.1 --cloud aws 
+    ```
+
+- AUDIT TOOL N°4 - [CLOUDSPLAINING](https://github.com/salesforce/cloudsplaining)
+  - Cloudsplaining is an AWS IAM Security Assessment tool that identifies violations of least privilege and generates a risk-prioritized report.
+
+    ```
+    --------------------
+    Install using PIP3
+    --------------------
+    $ virtualenv -p python3 venv2
+    $ source venv2/bin/activate
+    $ pip3 install --user cloudsplaining
+    ```
+    ```
+    ------------------------------------------------------
+    Example of commands -  Scanning an entire AWS Account
+    ------------------------------------------------------
+    - You must have AWS credentials configured that can be used by the CLI.
+    - You must have the privileges to run iam:GetAccountAuthorizationDetails.
+      The arn:aws:iam::aws:policy/SecurityAudit policy includes this, as do many others that allow Read access to the IAM Service.
+  
+    Step 1. Downloading account authorization Details
+    $ cloudsplaining download                      #If you use environment variables 
+    $ cloudsplaining download --profile myprofile  #With a profile (~/.aws/credentials)
+  
+    Step 2. Create exclusions file
+    cloudsplaining create-exclusions-file          #Follow instructions from the Github project 
+    
+    Step 3. Scanning the authorization details file
+    $ cloudsplaining scan --exclusions-file exclusions.yml --input-file examples/files/example.json --output examples/files/
+    -> It will create an HTML report and a JSON report.
+    ```
+
+  
+#### 2.3. CHECK FOR KNOWN PRIVESC ATTACK VECTORS IN AWS
+  
+- Usefull ressources:
+  - https://github.com/RhinoSecurityLabs/AWS-IAM-Privilege-Escalation
+  - https://rhinosecuritylabs.com/aws/aws-privilege-escalation-methods-mitigation/
+  - https://bishopfox.com/blog/5-privesc-attack-vectors-in-aws
+  - https://bishopfox.com/blog/privilege-escalation-in-aws
+
+##### 2.3.1 Discover privilege escalation paths across 10+ AWS services with the tool 'Heimdall'
+
+- [HEIMDALL](https://github.com/DenizParlak/heimdall) 
   - Heimdall is an AWS security scanner that discovers privilege escalation paths attackers could exploit to gain admin access.
   - AWS Attack Path Scanner:
     - 50+ IAM privilege escalation patterns detected
@@ -1413,126 +1531,10 @@ A comprehensive checklist for evaluating the security posture of an AWS account 
     ✓ Detected 59 direct privilege escalation opportunities
     <SNIP>
     ```
-  
-- AUDIT TOOL N°4 - [CLOUDSPLOIT](https://github.com/aquasecurity/cloudsploit) 
-  - It is an open-source project designed to allow detection of security risks in cloud infrastructure accounts, including: Amazon Web Services (AWS), Microsoft Azure, Google Cloud Platform (GCP), Oracle Cloud Infrastructure (OCI), and GitHub. These scripts are designed to return a series of potential misconfigurations and security risks.
-    ```
-    -------------
-    Using Docker
-    -------------
-    $ git clone https://github.com/aquasecurity/cloudsploit.git
-    $ cd cloudsploit
-    $ docker build . -t cloudsploit:0.0.1 
-  
-    ┌──(auditor㉿kali)-[~/…/Tools/Cloud-AWS/CloudSploit/cloudsploit]
-    └─$ docker run cloudsploit:0.0.1                          
     
-       _____ _                 _  _____       _       _ _   
-      / ____| |               | |/ ____|     | |     (_) |  
-     | |    | | ___  _   _  __| | (___  _ __ | | ___  _| |_ 
-     | |    | |/ _ \| | | |/ _` |\___ \| '_ \| |/ _ \| | __|
-     | |____| | (_) | |_| | (_| |____) | |_) | | (_) | | |_ 
-      \_____|_|\___/ \__,_|\__,_|_____/| .__/|_|\___/|_|\__|
-                                       | |                  
-                                       |_|                  
-    
-      CloudSploit by Aqua Security, Ltd.
-      Cloud security auditing for AWS, Azure, GCP, Oracle, and GitHub
-    
-    usage: cloudsploit-scan [-h] [--config CONFIG]
-                            [--compliance {hipaa,cis,cis1,cis2,pci}]
-                            [--plugin PLUGIN] [--govcloud] [--china] [--csv CSV]
-                            [--json JSON] [--junit JUNIT]
-                            [--console {none,text,table}]
-                            [--collection COLLECTION] [--ignore-ok] [--exit-code]
-                            [--skip-paginate] [--suppress SUPPRESS]
-                            [--remediate REMEDIATE]
-                            [--cloud {aws,azure,github,google,oracle,alibaba}]
-                            [--run-asl]
-    
-    optional arguments:
-      -h, --help            show this help message and exit
-      --config CONFIG       The path to a CloudSploit config file containing cloud
-                            credentials. See config_example.js. If not provided,
-                            logic will use default AWS credential chain and will
-                            also override provided cloud
-      --compliance {hipaa,cis,cis1,cis2,pci}
-                            Compliance mode. Only return results applicable to the
-                            selected program.
-      --plugin PLUGIN       A specific plugin to run. If none provided, all
-                            plugins will be run. Obtain from the exports.js file.
-                            E.g. acmValidation
-      --govcloud            AWS only. Enables GovCloud mode.
-      --china               AWS only. Enables AWS China mode.
-      --csv CSV             Output: CSV file
-      --json JSON           Output: JSON file
-      --junit JUNIT         Output: Junit file
-      --console {none,text,table}
-                            Console output format. Default: table
-      --collection COLLECTION
-                            Output: full collection JSON as file
-      --ignore-ok           Ignore passing (OK) results
-      --exit-code           Exits with a non-zero status code if non-passing
-                            results are found
-      --skip-paginate       AWS only. Skips pagination (for debugging).
-      --suppress SUPPRESS   Suppress results matching the provided Regex. Format:
-                            pluginId:region:resourceId
-      --remediate REMEDIATE
-                            Run remediation the provided plugin
-      --cloud {aws,azure,github,google,oracle,alibaba}
-                            The name of cloud to run plugins for. If not provided,
-                            logic will assume cloud from config.js file based on
-                            provided credentials
-      --run-asl             When set, it will execute custom plugins.
-    ```
-    ```
-    ------------------
-    Example of command
-    ------------------
-    $ docker run --rm -e AWS_ACCESS_KEY_ID=XXXXX -e AWS_SECRET_ACCESS_KEY=YYYYYYY cloudsploit:0.0.1 --cloud aws 
-    ```
+##### 2.3.2 Examples of known privesc attack vectors in AWS (IAM, Lambda, Glue, CodeStar)
 
-- AUDIT TOOL N°5 - [CLOUDSPLAINING](https://github.com/salesforce/cloudsplaining)
-  - Cloudsplaining is an AWS IAM Security Assessment tool that identifies violations of least privilege and generates a risk-prioritized report.
-
-    ```
-    --------------------
-    Install using PIP3
-    --------------------
-    $ virtualenv -p python3 venv2
-    $ source venv2/bin/activate
-    $ pip3 install --user cloudsplaining
-    ```
-    ```
-    ------------------------------------------------------
-    Example of commands -  Scanning an entire AWS Account
-    ------------------------------------------------------
-    - You must have AWS credentials configured that can be used by the CLI.
-    - You must have the privileges to run iam:GetAccountAuthorizationDetails.
-      The arn:aws:iam::aws:policy/SecurityAudit policy includes this, as do many others that allow Read access to the IAM Service.
-  
-    Step 1. Downloading account authorization Details
-    $ cloudsplaining download                      #If you use environment variables 
-    $ cloudsplaining download --profile myprofile  #With a profile (~/.aws/credentials)
-  
-    Step 2. Create exclusions file
-    cloudsplaining create-exclusions-file          #Follow instructions from the Github project 
-    
-    Step 3. Scanning the authorization details file
-    $ cloudsplaining scan --exclusions-file exclusions.yml --input-file examples/files/example.json --output examples/files/
-    -> It will create an HTML report and a JSON report.
-    ```
-
-  
-#### 2.3. CHECK FOR KNOWN PRIVESC ATTACK VECTORS IN AWS
-  
-- Usefull ressources:
-  - https://github.com/RhinoSecurityLabs/AWS-IAM-Privilege-Escalation
-  - https://rhinosecuritylabs.com/aws/aws-privilege-escalation-methods-mitigation/
-  - https://bishopfox.com/blog/5-privesc-attack-vectors-in-aws
-  - https://bishopfox.com/blog/privilege-escalation-in-aws
-
-##### 2.2.1 Privilege escalation - Abusing IAM permissions
+###### Privilege escalation - Abusing IAM permissions
 
 - IAM Permissions on Other Users  
   - The following user account and group permissions can all be used to escalate privileges:
@@ -1571,7 +1573,7 @@ A comprehensive checklist for evaluating the security posture of an AWS account 
   - The 'iam:PassRole' permission allows a user to pass a role to an AWS entity. Passing roles is a crucial element in AWS permissions and resource management. For instance, when deploying an application to AWS, the application may need to perform certain actions on the back end, such as accessing databases or running Lambda functions. In order to allow the application to access these AWS services, you pass a role to it that contains the necessary permissions.
   - Problems with the 'iam:PassRole' permission occur when there is no defined role or set of roles that the principal is allowed to pass. For instance, policies that allow the use of iam:PassRole on wildcard resources (iam:PassRole:*). In effect, this allows the user to pass any role that exists in the environment, including any existing privileged roles. This may open up the possibility for a user to pass a privileged role to an AWS resource or service, and then use that resource or service to perform privileged actions.
 
-##### 2.2.2 Privilege escalation - Abusing LAMBDA permissions
+###### Privilege escalation - Abusing LAMBDA permissions
 
 - LAMBDA - 'lambda:UpdateFunctionCode' and 'lambda:UpdateFunctionConfiguration'
   - With access to the 'lambda:UpdateFunctionCode' permission, an adversary can modify an existing Lambda function's code. This would allow them to gain access to the privileges of the associated IAM role the next time the function is executed. The risk here depends on the permissions with which the Lambda function operates.
@@ -1579,18 +1581,18 @@ A comprehensive checklist for evaluating the security posture of an AWS account 
 - LAMBDA - 'lambda:UpdateFunctionConfiguration'
   - With access to the lambda:UpdateFunctionConfiguration permission, an adversary can modify an existing Lambda function's configuration to add a new Lambda Layer. This Layer would then override an existing library and allow an adversary to execute malicious code under the privilege of the role associated with the Lambda function.
 
-##### 2.2.3 Privilege escalation - Abusing GLUE permissions
+###### Privilege escalation - Abusing GLUE permissions
 
 - GLUE - 'glue:UpdateDevEndpoint' and 'glue:GetDevEndpoint'
   - The permission to modify a Glue development endpoint (glue:UpdateDevEndpoint) can lead to privilege escalation because a user might, for example, change the SSH key associated with an endpoint so they can then log into the system and use it to perform privileged actions (i.e, gain access to IAM credentials associated with the role attached to the glue endpoint). Again, the risk depends on the permissions assigned to the endpoint.
     - Though not required, it may be helpful to have the glue:GetDevEndpoint permission as well, if the existing endpoint cannot be identified via other means.
 
-##### 2.2.4 Privilege escalation - Abusing CODESTAR permissions
+###### Privilege escalation - Abusing CODESTAR permissions
 
 - CODESTAR - 'codestar:CreateProject' and 'codestar:AssociateTeamMember'
   - With access to the 'codestar:CreateProject' and 'codestar:AssociateTeamMember' permissions, an adversary can create a new CodeStar project and associate themselves as an Owner of the project. This will attach a new policy to the user that provides access to a number of permissions for AWS services. This is most useful for further enumeration as it gives access to 'lambda:List*', 'iam:ListRoles', 'iam:ListUsers', and more.
 
-##### 2.2.5 Privilege escalation - Abusing CloudFormation permissions
+###### Privilege escalation - Abusing CloudFormation permissions
 
 - CloudFormation and Data Pipeline may be used for privesc if the user has the 'iam:PassRole' permission.
 
@@ -1648,7 +1650,6 @@ Link - https://aws.amazon.com/pt/security/penetration-testing/
 
 #### 3.3. LIST OF AWS PENTEST TOOLS
 
-
 | Tools | Description |
 | --- | --- |
 | [PACU](https://github.com/RhinoSecurityLabs/pacu) | The AWS exploitation framework, designed for testing the security of Amazon Web Services environments. |
@@ -1657,6 +1658,7 @@ Link - https://aws.amazon.com/pt/security/penetration-testing/
 | [S3Scanner](https://github.com/sa7mon/S3Scanner) | Scan for misconfigured S3 buckets across S3-compatible APIs. |
 | [S3_objects_check](https://github.com/nccgroup/s3_objects_check) | Whitebox evaluation of effective S3 object permissions, to identify publicly accessible files.|
 | [CloudPEASS](https://github.com/peass-ng/CloudPEASS) | Multi-Cloud Privilege Escalation Awesome Script Suite - AWSPEAS is your ultimate tool for enumerating AWS permissions and uncovering potential privilege escalation paths and other attack vectors—all while leaving your target environment unchanged. It leverages multiple techniques to gather, simulate, and even infer permissions, giving you deep insights into the security posture of your AWS setup.Whitebox evaluation of effective S3 object permissions, to identify publicly accessible files.|
+| [HEIMDALL](https://github.com/DenizParlak/heimdall) | AWS security scanner that discovers privilege escalation paths across 10+ AWS services (EC2, RDS, S3, Lambda, KMS, Secrets Manager, STS, SNS, SQS, DynamoDB). |
 | [Enumerate-IAM](https://github.com/andresriancho/enumerate-iam) | Enumerate the permissions associated with AWS credential set. |
 | [IAMActionHunter](https://github.com/RhinoSecurityLabs/IAMActionHunter) | An AWS IAM policy statement parser and query tool. |
 | [AWS IAM Privilege Escalation](https://github.com/RhinoSecurityLabs/AWS-IAM-Privilege-Escalation) | AWS IAM Privilege Escalation Methods |
