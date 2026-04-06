@@ -1,31 +1,31 @@
-## AWS Cloud Security Assessment
+# 🛡️ AWS Cloud Security Assessment
 Technical notes, list of tools, scripts and commands that are useful for assessing the security posture of an AWS Cloud environment (audit & pentest).
 
-### Table of contents 
-- I. AWS Cloud Essentials - Reminder
-  - [1.1. Introduction](#11-INTRODUCTION)
-  - [1.2. Main AWS services across IaaS, PaaS, and SaaS](#12-main-aws-services-across-iaas-paas-and-saas)
-  - [1.3. AWS security best practices](#13-AWS-Security-Best-Practices)
-  - [1.4. Key differences between the AWS Root User, IAM Users, Roles, and Groups](#14-key-differences-between-root-user-iam-user-role-and-group)
-  - [1.5. Cloud‑Native Application Protection Platforms (CNAPP)](#15-cloudnative-application-protection-platforms-cnapp)
-  - [1.6. How to use the AWS CLI](#16-How-to-use-the-AWS-CLI)
-  - [1.7. List of usefull AWS CLI commands](#17-List-of-usefull-AWS-CLI-commands)
-  - [1.8. List of AWS URL services](#18-LIST-OF-AWS-URL-Services)
-  - [1.9. Basic tutorial to create a Kali Linux EC2 VM on AWS](#19-Basic-tutorial-to-create-a-Kali-Linux-EC2-VM-on-AWS)
+## 📚 Table of Contents
 
-- II. AWS Security Audit
-  - [2.1. AWS security assessment checklist (governance and technical levels)](#21-aws-security-assessment-checklist-governance-and-technical-levels)
-  - [2.2. Assess the security configuration of an AWS account using audit tools](#22-assess-the-security-configuration-of-an-aws-account-using-audit-tools)
-    - Tools: CloudSuite, Prowler, CloudSploit, Cloudsplaining
-  - [2.3. Check for known privesc attack vectors in AWS](#23-check-for-known-privesc-attack-vectors-in-aws)
-    - Discover privilege escalation paths across 10+ AWS services with the tool 'Heimdall'
-    - Examples of known privesc attack vectors in AWS (IAM, Lambda, Glue, CodeStar)
+### I. AWS Cloud Essentials - Reminder  
+1.1 [Introduction](#11-INTRODUCTION)  
+1.2 [Main AWS services across IaaS, PaaS, and SaaS](#12-main-aws-services-across-iaas-paas-and-saas)  
+1.3 [AWS security best practices](#13-AWS-Security-Best-Practices)  
+1.4 [Key differences between the AWS Root User, IAM Users, Roles, and Groups](#14-key-differences-between-root-user-iam-user-role-and-group)  
+1.5 [Cloud‑Native Application Protection Platforms (CNAPP)](#15-cloudnative-application-protection-platforms-cnapp)  
+1.6 [How to use the AWS CLI](#16-How-to-use-the-AWS-CLI)  
+1.7 [List of usefull AWS CLI commands](#17-List-of-usefull-AWS-CLI-commands)  
+1.8 [List of AWS URL services](#18-LIST-OF-AWS-URL-Services)  
+1.9 [Basic tutorial to create a Kali Linux EC2 VM on AWS](#19-Basic-tutorial-to-create-a-Kali-Linux-EC2-VM-on-AWS)  
 
-- III. AWS Penetration Testing
-  - [3.1. AWS customer support and service policy for penetration testing](#31-aws-customer-support-and-service-policy-for-penetration-testing)
-  - [3.2. AWS pentest methodology - Usefull ressources](#32-aws-pentest-methodology---usefull-ressources)
-  - [3.3. List of AWS penetration testing tools](#33-list-of-aws-pentest-tools)
-  - [3.4. List of AWS pentesting and security CTFs](#34-list-of-aws-cloud-pentesting-and-securty-ctfs)
+### II. AWS Security Audit  
+2.1. [AWS security assessment checklist (governance and technical levels)](#21-aws-security-assessment-checklist-governance-and-technical-levels)  
+2.2. [Assess the security configuration of an AWS account using audit tools](#22-assess-the-security-configuration-of-an-aws-account-using-audit-tools)  
+    - Tools: CloudSuite, Prowler, CloudSploit, Cloudsplaining  
+2.3. [Check for known privesc attack vectors in AWS](#23-check-for-known-privesc-attack-vectors-in-aws)  
+    - Discover privilege escalation paths across 10+ AWS services with the tool 'Heimdall'  
+    - Examples of known privesc attack vectors in AWS (IAM, Lambda, Glue, CodeStar)  
+
+### III. AWS Penetration Testing  
+3.1. [AWS pentest methodology - Usefull ressources](#32-aws-pentest-methodology---usefull-ressources)  
+3.2. [List of AWS penetration testing tools](#33-list-of-aws-pentest-tools)  
+3.3. [List of AWS pentesting and security CTFs](#34-list-of-aws-cloud-pentesting-and-securty-ctfs)  
 
 ----------------
 
