@@ -1,4 +1,5 @@
-# 🛡️ AWS Cloud Security Assessment
+# AWS Cloud Security Assessment
+
 Technical notes, list of tools, scripts and commands that are useful for assessing the security posture of an AWS Cloud environment (audit & pentest).
 
 ## 📚 Table of Contents
@@ -42,7 +43,9 @@ These models differ in how much control the customer retains versus how much AWS
 
 #### 1.2. MAIN AWS SERVICES ACROSS IAAS, PaaS, AND SaaS
 
-- AWS Cloud - Infrastructure as a Service (IaaS) - These services give raw compute, storage, and networking building blocks.
+**Infrastructure as a Service (IaaS)**
+
+- These services give raw compute, storage, and networking building blocks.
 
   | Service | Description |
   | --- | --- |
@@ -57,8 +60,9 @@ These models differ in how much control the customer retains versus how much AWS
   | AWS Direct Connect | Establishes dedicated network connections between your data center and AWS. |
   | ... | ... |
 
+**Platform as a Service (PaaS)**
 
-- AWS Cloud - Platform as a Service (PaaS) - These services abstract away infrastructure so user can focus on code and applications.
+- These services abstract away infrastructure so user can focus on code and applications.
 
   | Service | Description |
   | --- | --- |
@@ -76,7 +80,9 @@ These models differ in how much control the customer retains versus how much AWS
   | AWS Secrets Manager | It securely stores and manages sensitive credentials, providing controlled access and automated rotation to keep your applications and cloud environment safer. |
   | ... | ... |
 
-- AWS Cloud - Software as a Service (SaaS) - These are fully managed applications delivered directly to end users.
+**Software as a Service (SaaS)**
+
+- These are fully managed applications delivered directly to end users.
 
   | Service | Description |
   | --- | --- |
@@ -93,7 +99,7 @@ These models differ in how much control the customer retains versus how much AWS
 
 #### 1.3. AWS SECURITY BEST PRACTICES
 
-- Identity & Access Management
+- **Identity & Access Management**
   - Secure your AWS account.
     - Use AWS Organizations to manage your accounts, use the root user by exception with multi-factor authentication (MFA) enabled, and configure account contacts.
   - Rely on centralized identity provider.
@@ -103,7 +109,7 @@ These models differ in how much control the customer retains versus how much AWS
   - Store and use secrets securely.
     - Where you cannot use temporary credentials, like tokens from AWS Security Token Service, store your secrets like database passwords using AWS Secrets Manager which handles encryption, rotation, and access control.
 
-- Role Management
+- **Role Management**
   - Apply least‑privilege permissions and use IAM roles instead of long‑lived IAM users  
     - Grant only the minimum permissions required for each role and rely on temporary credentials through IAM roles to eliminate static access keys.
   - Enforce strong separation of duties with role‑based access control (RBAC)  
@@ -115,7 +121,7 @@ These models differ in how much control the customer retains versus how much AWS
   - Manage the usage and risks of assumed roles by restricting who can assume them and monitoring cross‑account trust relationships
     - Overly broad trust policies or permissive 'sts:AssumeRole' permissions can allow unintended access paths, privilege escalation, or unauthorized lateral movement across accounts. Regularly review trust policies, enforce MFA‑protected role assumption, and monitor CloudTrail for unusual or high‑risk role‑assumption patterns.
 
-- Infrastructure Protection
+- **Infrastructure Protection**
   - Patch your operating system, applications, and code.
     - Use AWS Systems Manager Patch Manager to automate the patching process of all systems and code for which you are responsible, including your OS, applications, and code dependencies.
   - Harden your EC2 instances
@@ -142,7 +148,7 @@ These models differ in how much control the customer retains versus how much AWS
     - Capture flow logs for visibility into traffic patterns and anomalies, and rely on GuardDuty to detect suspicious behavior such as port scanning, unusual API calls, or compromised instances.
     - Amazon GuardDuty is a threat detection service that analyzes VPC Flow Logs, DNS logs, and CloudTrail events to identify suspicious or malicious activity in your network.
 
-- Data Protection
+- **Data Protection**
   - Protect data at rest.
     - Use AWS Key Management Service (KMS) to protect data at rest across a wide range of AWS services and your applications. Enable default encryption for Amazon EBS volumes, and Amazon S3 buckets.
   - Encrypt data in transit.
@@ -150,7 +156,7 @@ These models differ in how much control the customer retains versus how much AWS
   - Use mechanisms to keep people away from data.
     - Keep all users away from directly accessing sensitive data and systems. For example, provide an Amazon QuickSight dashboard to business users instead of direct access to a database, and perform actions at a distance using AWS Systems Manager automation documents and Run Command.
 
-- Incident Detection
+- **Incident Detection**
   - Enable foundational services: AWS CloudTrail, Amazon GuardDuty, and AWS Security Hub.
     - For all your AWS accounts configure CloudTrail to log API activity, use GuardDuty for continuous monitoring, and use AWS Security Hub for a comprehensive view of your security posture.
   - Configure service and application level logging.
@@ -159,7 +165,7 @@ Balancer access logging, to gain visibility into events. Configure logs to flow 
   - Configure monitoring and alerts, and investigate events.
     - Enable AWS Config to track the history of resources, and Config Managed Rules to automatically alert or remediate on undesired changes. For all your sources of logs and events, from AWS CloudTrail, to Amazon GuardDuty and your application logs, configure alerts for high priority events and investigate.
    
-- Incident Response
+- **Incident Response**
   - Ensure you have an incident response (IR) plan.
     - Begin your IR plan by building runbooks to respond to unexpected events in your workload. For details, see the AWS Security Incident Response Guide.
   - Make sure that someone is notified to take action on critical findings.
@@ -169,7 +175,7 @@ Balancer access logging, to gain visibility into events. Configure logs to flow 
 
 #### 1.4. KEY DIFFERENCES BETWEEN ROOT USER, IAM USER, ROLE, AND GROUP
 
-  - Root User
+  - **Root User**
     - Root user = account owner with unlimited power (i.e., it has full, irreversible access to every AWS resource and billing setting).
     - Created automatically when the AWS account is created.
     - Uses the email and password of the AWS account owner.
@@ -177,22 +183,22 @@ Balancer access logging, to gain visibility into events. Configure logs to flow 
     - Should be used only for specific tasks such as: changing the AWS account settings, closing the AWS account, restoring MFA, managing certain billing features.
     - Security Best Practices: enable MFA on the root account immediately, create an admin IAM user for administrative tasks and DO NOT use the root account (lock away the root credentials and use them only when required).
 
-  - IAM User
+  - **IAM User**
     - User = A long‑term identity with permanent credentials (password, access keys).
     - Users authenticate directly, while roles require AssumeRole to obtain temporary credentials.
     - Users are for humans or applications, roles are for delegation and cross‑account access, and groups are for permission management.
     - Can be part of groups, roles, and policies.
     - Used for everyday operations such as: Managing EC2, S3, RDS, Lambda, ..., deploying applications, admin tasks (if granted)
 
-  - IAM Role
+  - **IAM Role**
     - Role = An identity that provides temporary credentials and must be assumed via STS; it has no password or access keys of its own.
     - Roles are commonly used by AWS services (EC2, Lambda, etc.) to access other AWS resources securely.
 
-  - IAM Group
+  - **IAM Group**
     - A container for users that lets you assign permissions to many users at once; it is not an identity and cannot be assumed.
     - Groups cannot contain other groups (no nesting), and they cannot be used by AWS services.
 
-  - IAM Users vs. IAM Roles — Key Differences
+  - **IAM Users vs. IAM Roles — Key Differences**
     - Credential Type
       - IAM Users: Have long‑lived credentials — passwords and access keys that persist until manually rotated.
       - IAM Roles: Provide temporary credentials issued by STS that automatically expire, reducing risk if compromised.
@@ -243,17 +249,17 @@ Key Capabilities (from AWS documentation):
   - Automated workflows that help teams respond to findings efficiently at scale
 
 - TOP 5 Cloud‑Native Application Protection Platforms (CNAPP)
-  - PRISMA Cloud (Palo Alto Networks)
+  - **PRISMA Cloud (Palo Alto Networks)**
     - It is a full CNAPP platform that secures cloud environments across the entire application lifecycle, including CSPM (security posture management), CWPP (workload protection), CIEM, IaC scanning, and runtime protection.
     - It provides unified visibility and threat detection across multi‑cloud deployments, helping organizations secure workloads, identities, and configurations from code to production.
-  - WIZ
+  - **WIZ**
     - It is an agentless CNAPP platform known for deep cloud visibility, vulnerability detection, and risk prioritization across multi‑cloud environments. It correlates misconfigurations, vulnerabilities, identities, and network exposure to highlight the most critical attack paths.
     - Security Graph technology analyzes relationships between technologies in cloud environments to uncover critical pathways to breaches with contextual data. Attack path analysis provides prioritized issues showing toxic combinations of risk with high probability of exploitation and significant business impact.
-  - Microsoft Defender for Cloud
+  - **Microsoft Defender for Cloud**
     - It offers CSPM and CWPP with deep Azure integration and strong support for AWS and GCP. It provides automated hardening recommendations, threat detection, and compliance monitoring.
-  - ORCA Security
+  - **ORCA Security**
     - It is an agentless CNAPP platform that scans cloud environments using side‑scanning technology to detect vulnerabilities, misconfigurations, and identity risks. It provides broad visibility across workloads, containers, and cloud services without requiring agents.
-  - CrowdStrike Falcon Cloud Security
+  - **CrowdStrike Falcon Cloud Security**
     - It is a cloud security suite that focuses heavily on workload protection, runtime threat detection, and behavioral analytics. It integrates with the broader Falcon platform, providing unified endpoint and cloud threat intelligence.
 
 
