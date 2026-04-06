@@ -1,4 +1,4 @@
-## 🛡️ AWS Cloud Security Assessment
+# 🛡️ AWS Cloud Security Assessment
 Technical notes, list of tools, scripts and commands that are useful for assessing the security posture of an AWS Cloud environment (audit & pentest).
 
 ## 📚 Table of Contents
