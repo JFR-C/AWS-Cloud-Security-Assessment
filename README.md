@@ -24,7 +24,7 @@ Technical notes, list of tools, scripts and commands that are useful for assessi
     - Examples of known privesc attack vectors in AWS (IAM, Lambda, Glue, CodeStar)  
 
 ### III. AWS Penetration Testing  
-3.1. [AWS customer support and service policy for penetration testing](#31-aws-customer-support-and-service-policy-for-penetration-testing)
+3.1. [AWS customer support and service policy for penetration testing](#31-aws-customer-support-and-service-policy-for-penetration-testing)  
 3.2. [AWS pentest methodology - Usefull ressources](#32-aws-pentest-methodology---usefull-ressources)  
 3.3. [List of AWS penetration testing tools](#33-list-of-aws-pentest-tools)  
 3.4. [List of AWS pentesting and security CTFs](#34-list-of-aws-cloud-pentesting-and-securty-ctfs)  
