@@ -31,6 +31,7 @@ Technical notes, list of tools, scripts and commands that are useful for assessi
 
 ----------------
 
+
 ### I. AWS Cloud Essentials - Reminder
 
 #### 1.1. INTRODUCTION
@@ -41,6 +42,7 @@ The AWS Cloud encompasses a broad set of global cloud-based products that includ
 - AWS delivers cloud capabilities through the three service models: Software as a Service (SaaS), Platform as a Service (PaaS), and Infrastructure as a Service (IaaS). 
 These models differ in how much control the customer retains versus how much AWS manages. Understanding these layers helps teams choose the right level of abstraction for their applications, operations, and security responsibilities.
 
+────────────────────────────────
 
 #### 1.2. MAIN AWS SERVICES ACROSS IAAS, PaaS, AND SaaS
 
@@ -97,6 +99,7 @@ These models differ in how much control the customer retains versus how much AWS
   | Amazon GuardDuty | A fully managed threat detection service that continuously monitors for malicious activity. |
   | ... | ... |
 
+────────────────────────────────
 
 #### 1.3. AWS SECURITY BEST PRACTICES
 
@@ -174,6 +177,8 @@ Balancer access logging, to gain visibility into events. Configure logs to flow 
   - Practice responding to events.
     - Simulate and practice incident response by running regular game days, incorporating the lessons learned into your incident management plans, and continuously improving them.
 
+────────────────────────────────
+
 #### 1.4. KEY DIFFERENCES BETWEEN ROOT USER, IAM USER, ROLE, AND GROUP
 
   - **Root User**
@@ -219,6 +224,7 @@ Balancer access logging, to gain visibility into events. Configure logs to flow 
       - IAM Users: Actions are logged under the user’s identity.
       - IAM Roles: Actions are logged under the role, but CloudTrail shows who assumed the role, improving accountability.
 
+────────────────────────────────
 
 #### 1.5. CLOUD‑NATIVE APPLICATION PROTECTION PLATFORMS (CNAPP)
 
@@ -263,6 +269,7 @@ Key Capabilities (from AWS documentation):
   - **CrowdStrike Falcon Cloud Security**
     - It is a cloud security suite that focuses heavily on workload protection, runtime threat detection, and behavioral analytics. It integrates with the broader Falcon platform, providing unified endpoint and cloud threat intelligence.
 
+────────────────────────────────
 
 #### 1.6. HOW TO USE THE AWS CLI
 
@@ -365,7 +372,8 @@ Key Capabilities (from AWS documentation):
     }
     ```
   
-  
+────────────────────────────────
+
 #### 1.7. LIST OF USEFULL AWS CLI COMMANDS
    
 | Amazon Web Service | ACTION | COMMAND | 
@@ -434,6 +442,7 @@ Key Capabilities (from AWS documentation):
 | Kubernetes (EKS) | List EKS clusters | aws eks list-clusters --region region | 
 | Kubernetes (EKS) | Update kubeconfig | aws eks update-kubeconfig --name cluster-name --region region | 
 
+────────────────────────────────
 
 #### 1.8. LIST OF AWS URL Services
 
@@ -463,6 +472,8 @@ Key Capabilities (from AWS documentation):
 | kinesisvideo | `https://{random_id}.kinesisvideo.{region}.amazonaws.com` |
 | mediaconvert | `https://{random_id}.mediaconvert.{region}.amazonaws.com` |
 | mediapackage | `https://{random_id}.mediapackage.{region}.amazonaws.com/in/v1/{random_id}/channel` |
+
+────────────────────────────────
 
 #### 1.9. BASIC TUTORIAL TO CREATE A KALI LINUX EC2 VM ON AWS
 
@@ -641,6 +652,7 @@ A comprehensive checklist for evaluating the security posture of an AWS account 
   | Compliance |  |  |
   | IR & DR |  |  |
 
+────────────────────────────────
 
 #### 2.2. ASSESS THE SECURITY CONFIGURATION OF AN AWS ACCOUNT USING AUDIT TOOLS
 
@@ -1538,7 +1550,7 @@ A comprehensive checklist for evaluating the security posture of an AWS account 
     ✓ Detected 59 direct privilege escalation opportunities
     <SNIP>
     ```
-    
+
 #### 2.3.2 Examples of known privesc attack vectors in AWS (IAM, Lambda, Glue, CodeStar)
 
 ###### Privilege escalation - Abusing IAM permissions
@@ -1645,9 +1657,11 @@ Link - https://aws.amazon.com/pt/security/penetration-testing/
 - Prohibited Services for Outbound Penetration Testing
   - Amazon API Gateway
 
+────────────────────────────────
+
 #### 3.2. AWS PENTEST METHODOLOGY 
 
-##### 3.2.1. USEFULL RESSOURCES
+#### 3.2.1. Usefull ressources
   - https://hackingthe.cloud/aws/general-knowledge/aws_cli_tips_and_tricks/
   - https://github.com/swisskyrepo/InternalAllTheThings/tree/main/docs/cloud/aws
   - https://pentestbook.six2dez.com/enumeration/cloud/aws
@@ -1657,7 +1671,7 @@ Link - https://aws.amazon.com/pt/security/penetration-testing/
   - https://github.com/dafthack/CloudPentestCheatsheets/blob/master/cheatsheets/AWS.md
 
     
-##### 3.2.2. CLASSIC AWS PENTEST SCENARIOS 
+#### 3.2.2. Classic AWS penetration testing scenarios
 
   - STEP 1 - Scanning and Enumeration
     + Use tools like:
@@ -1748,6 +1762,7 @@ Link - https://aws.amazon.com/pt/security/penetration-testing/
       + Establish persistence using a Lambda function
       + ...
 
+────────────────────────────────
 
 #### 3.3. LIST OF AWS PENTEST TOOLS
 
@@ -1767,6 +1782,7 @@ Link - https://aws.amazon.com/pt/security/penetration-testing/
 | [Stratus Red Team](https://github.com/DataDog/stratus-red-team) | It is "Atomic Red Team™" for the cloud, allowing to emulate offensive attack techniques in a granular and self-contained manner. |
 | [EC2StepShell](https://github.com/saw-your-packet/EC2StepShell) | It is an AWS post-exploitation tool for getting high privileges reverse shells in public or private EC2 instances. |
 
+────────────────────────────────
 
 #### 3.4. LIST OF AWS CLOUD PENTESTING AND SECURTY CTFS
 
