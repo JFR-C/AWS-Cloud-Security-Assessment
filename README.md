@@ -1671,7 +1671,7 @@ Link - https://aws.amazon.com/pt/security/penetration-testing/
   - https://github.com/dafthack/CloudPentestCheatsheets/blob/master/cheatsheets/AWS.md
 
     
-#### 3.2.2. Classic AWS penetration testing scenarios
+#### 3.2.2. Classic AWS penetration testing methodology
 
   - STEP 1 - Scanning and Enumeration
     + Use tools like:
