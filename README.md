@@ -1688,8 +1688,7 @@ Link - https://aws.amazon.com/pt/security/penetration-testing/
       + ...
     
   - STEP 4 - Post-Exploitation
-    + After escalating privileges you may want to run OS commands and take over EC2 instances in the AWS account.  
-      Leverage privileged access in a compromised AWS account to run arbitrary commands on EC2 instances.
+    + After escalating privileges you may want to run arbitrary OS commands and take over EC2 instances in the AWS account.  
       ```
       Example 1 (ssm:SendCommand & ssm:ListCommandInvocations)
       --------------------------------------------------------
