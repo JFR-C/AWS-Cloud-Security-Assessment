@@ -1665,7 +1665,7 @@ Link - https://aws.amazon.com/pt/security/penetration-testing/
       + [Cloud_enum](https://github.com/initstring/cloud_enum)
       + ...
     + Discover and loot public S3 Buckets
-    + Discover and loot public EBS snapshots
+    + Discover and loot public Amazon Elastic Block Store (EBS) snapshots
     + Discover and loot public Amazon Machine Images (AMIs)
     + Detect Public Resource Exposure via Session Policy Error Messages
     + ...
@@ -1676,6 +1676,10 @@ Link - https://aws.amazon.com/pt/security/penetration-testing/
       + unprotected Amazon Machine Images (AMIs) 
       + unprotected Github / Gitlab / JFrog repositories
       + ...
+    + Abuse an insecure AssumeRole trust policy
+      + Enumerate exposed ARNs from public sources (e.g., a role ARN could be leaked in code, GitHub, CI logs, web responses, etc.)
+      + Test whether the target account’s trust policies allows us to assume it
+      + Observe whether AWS returns temporary credentials 
     + Find and exploit a critical vulnerability on a Website hosted on a EC2 Windows or Linux VM  
       then found AWS credentials hardcoded in a config file, a script, or a log files stored on the EC2 VM  
       or try to collect AWS creds in the the Meta-data of the EC2 VM (http://169.254.169.254/latest/meta-data/iam/security-credentials/<xxx>)
