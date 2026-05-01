@@ -1648,6 +1648,7 @@ Link - https://aws.amazon.com/pt/security/penetration-testing/
 #### 3.2. AWS PENTEST METHODOLOGY 
 
 ##### 3.2.1. USEFULL RESSOURCES
+  - https://hackingthe.cloud/aws/general-knowledge/aws_cli_tips_and_tricks/
   - https://github.com/swisskyrepo/InternalAllTheThings/tree/main/docs/cloud/aws
   - https://pentestbook.six2dez.com/enumeration/cloud/aws
   - https://github.com/CyberSecurityUP/Awesome-Cloud-PenTest
