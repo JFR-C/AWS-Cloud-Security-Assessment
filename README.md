@@ -18,10 +18,10 @@ Technical notes, list of tools, scripts and commands that are useful for assessi
 ### II. AWS Security Audit  
 2.1. [AWS security assessment checklist (governance and technical levels)](#21-aws-security-assessment-checklist-governance-and-technical-levels)  
 2.2. [Assess the security configuration of an AWS account using audit tools](#22-assess-the-security-configuration-of-an-aws-account-using-audit-tools)  
-    - Tools: CloudSuite, Prowler, CloudSploit, Cloudsplaining  
+     --- Tools: CloudSuite, Prowler, CloudSploit, Cloudsplaining  
 2.3. [Check for known privesc attack vectors in AWS](#23-check-for-known-privesc-attack-vectors-in-aws)  
-    - Discover privilege escalation paths across 10+ AWS services with the tool 'Heimdall'  
-    - Examples of known privesc attack vectors in AWS (IAM, Lambda, Glue, CodeStar)  
+     --- Discover privilege escalation paths across 10+ AWS services with the tool 'Heimdall'  
+     --- Examples of known privesc attack vectors in AWS (IAM, Lambda, Glue, CodeStar)  
 
 ### III. AWS Penetration Testing  
 3.1. [AWS customer support and service policy for penetration testing](#31-aws-customer-support-and-service-policy-for-penetration-testing)  
@@ -1645,15 +1645,47 @@ Link - https://aws.amazon.com/pt/security/penetration-testing/
 - Prohibited Services for Outbound Penetration Testing
   - Amazon API Gateway
 
-#### 3.2. AWS PENTEST METHODOLOGY - USEFULL RESSOURCES
+#### 3.2. AWS PENTEST METHODOLOGY 
 
+##### 3.2.1. USEFULL RESSOURCES
   - https://github.com/swisskyrepo/InternalAllTheThings/tree/main/docs/cloud/aws
   - https://pentestbook.six2dez.com/enumeration/cloud/aws
   - https://github.com/CyberSecurityUP/Awesome-Cloud-PenTest
   - https://github.com/CyberSecurityUP/Cloud-Security-Attacks
   - https://www.hackerone.com/knowledge-center/penetration-testing-aws-practical-guide
   - https://github.com/dafthack/CloudPentestCheatsheets/blob/master/cheatsheets/AWS.md
+
+    
+##### 3.2.2. CLASSIC AWS PENTEST SCENARIO 
+
+  - STEP 1 - Gaining Access
+    + Find on an unprotected public S3 bucket clear-text AWS account credentials hardcoded in a config file, a script, or a log files  
+    + Find and exploit a Website hosted on a EC2 Windows or Linux VM and then use 
+   
+    + 
+  - STEP 2 - Privielge Escalation
+    
+  - STEP 3 - Post Exploitation
  
+    + After gaining escalating privileges in a target AWS account or gaining privileged access you may want to run commands on EC2 instances in the account.  
+      Leverage privileged access in an AWS account to run arbitrary commands on an EC2 instance.
+
+      ✓ SEND COMMAND - ssm:SendCommand
+        Send arbitrary shell commands to EC2 instances from the AWS CLI via the following:
+        ```
+        aws ssm send-command \
+        --instance-ids "i-00000000000000000" \
+        --document-name "AWS-RunShellScript"
+        --parameters commands="*shell commands here*"
+       ```
+      ✓ LIST COMMAND - ssm:ListCommandInvocations  
+       If you would like to retrieve the output, make a note of the CommandId returned to you in the Send Command call.  
+       After a short period of time (to let the command run) you can use this Id to lookup the results. You can do this with the following:
+       ```
+       aws ssm list-command-invocations \
+       --command-id "command_id_guid" \
+       --details
+       ```  
 
 #### 3.3. LIST OF AWS PENTEST TOOLS
 
@@ -1671,6 +1703,7 @@ Link - https://aws.amazon.com/pt/security/penetration-testing/
 | [AWS IAM Privilege Escalation](https://github.com/RhinoSecurityLabs/AWS-IAM-Privilege-Escalation) | AWS IAM Privilege Escalation Methods |
 | [Orca-Security - Iam-ape](https://github.com/orcasecurity/orca-toolbox/tree/main/iam-ape) | APE takes all of your AWS IAM policies attached to a User, Group, or Role object, and presents you with a single policy, summarizing all of their actual permissions. Taking into account permissions, denials, inherited permissions and permission boundaries! |
 | [Stratus Red Team](https://github.com/DataDog/stratus-red-team) | It is "Atomic Red Team™" for the cloud, allowing to emulate offensive attack techniques in a granular and self-contained manner. |
+| [EC2StepShell](https://github.com/saw-your-packet/EC2StepShell) | It is an AWS post-exploitation tool for getting high privileges reverse shells in public or private EC2 instances. |
 
 
 #### 3.4. LIST OF AWS CLOUD PENTESTING AND SECURTY CTFS
